@@ -8,7 +8,6 @@ using Plugin.FirebasePushNotification;
 using System.Security.Cryptography;
 using WindowsAzure.Messaging;
 using WindowsAzure.Messaging.NotificationHubs;
-using NH = NotificationHub.Core.Maui.Constants;
 
 namespace NotificationHub.Maui.Platforms.Android
 {

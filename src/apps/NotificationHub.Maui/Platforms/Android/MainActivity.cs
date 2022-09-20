@@ -17,7 +17,7 @@ namespace NotificationHub.Maui.Platforms.Android
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-           
+
             WindowsAzure.Messaging.NotificationHubs.NotificationHub.SetListener(new AzureListener());
             WindowsAzure.Messaging.NotificationHubs.NotificationHub.Start(this.Application, NH.NotificationHubName, NH.ListenConnectionString);
         }

@@ -39,7 +39,7 @@ namespace NotificationHub.Maui.Platforms.Android
                 var notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID);
 
                 notificationBuilder.SetContentTitle((string)p.Data["title"])
-                            .SetSmallIcon(Resource.Drawable.ic_launcher)
+                            .SetSmallIcon(Resource.Drawable.notification_bg)
                             .SetContentText((string)p.Data["body"])
                             .SetAutoCancel(true)
                             .SetShowWhen(true)

@@ -7,6 +7,7 @@ using Android.Content;
 using Android.App;
 using WindowsAzure.Messaging.NotificationHubs;
 using AndroidX.Core.App;
+using Application = Microsoft.Maui.Controls.Application;
 
 namespace NotificationHub.Maui.Platforms.Android;
 
@@ -14,21 +15,23 @@ public class AzureListener: Java.Lang.Object, INotificationListener
 {
     public void OnPushNotificationReceived(Context context, INotificationMessage message)
     {
-        var intent = new Intent(MainApplication.Context, typeof(MainActivity));
+        var intent = new Intent(context, typeof(MainActivity));
         intent.AddFlags(ActivityFlags.ClearTop);
-        var pendingIntent = PendingIntent.GetActivity(MainApplication.Context, 0, intent, PendingIntentFlags.OneShot);
+        var pendingIntent = PendingIntent.GetActivity(context, 0, intent, PendingIntentFlags.OneShot);
 
-        var notificationBuilder = new NotificationCompat.Builder(MainApplication.Context, MainActivity.CHANNEL_ID);
+        var notificationBuilder = new NotificationCompat.Builder(context, MainActivity.CHANNEL_ID);
 
         notificationBuilder.SetContentTitle(message.Title)
                     .SetSmallIcon(Resource.Drawable.ic_launcher)
                     .SetContentText(message.Body)
                     .SetAutoCancel(true)
-                    .SetShowWhen(false)                   
+                    .SetShowWhen(true)
                     .SetContentIntent(pendingIntent);
 
-        var notificationManager = NotificationManager.FromContext(MainApplication.Context);
 
-        notificationManager.Notify(0, notificationBuilder.Build());
+        var notification = notificationBuilder.Build();
+        var notificationManager = NotificationManager.FromContext(context);
+
+        notificationManager.Notify(42, notification);
     }
 }

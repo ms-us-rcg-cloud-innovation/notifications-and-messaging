@@ -29,7 +29,7 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
-	<Import Project="C:\Users\sbanjanovic\.nuget\packages\xamarin.googleplayservices.basement\118.1.0\build\net6.0-android31.0\Xamarin.GooglePlayServices.Basement.targets" Condition="Exists('C:\Users\sbanjanovic\.nuget\packages\xamarin.googleplayservices.basement\118.1.0\build\net6.0-android31.0\Xamarin.GooglePlayServices.Basement.targets')" />
+	<Import Project="$(UserProfile)\.nuget\packages\xamarin.googleplayservices.basement\118.1.0\build\net6.0-android31.0\Xamarin.GooglePlayServices.Basement.targets" Condition="Exists('$(UserProfile)\.nuget\packages\xamarin.googleplayservices.basement\118.1.0\build\net6.0-android31.0\Xamarin.GooglePlayServices.Basement.targets')" />
 	
 	<PropertyGroup>
 	  <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net6.0-windows10.0.22621.0</TargetFrameworks>

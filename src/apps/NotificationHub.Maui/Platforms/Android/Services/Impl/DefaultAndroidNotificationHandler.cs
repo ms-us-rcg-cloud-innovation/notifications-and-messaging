@@ -6,6 +6,7 @@ using AndroidX.Core.App;
 using NotificationHub.Maui.Models;
 using NotificationHub.Maui.Platforms.Android;
 using NotificationHub.Maui.Services;
+using Plugin.FirebasePushNotification;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,44 @@ namespace NotificationHub.Core.Maui.Platforms.Android.Services.Impl;
 public class DefaultAndroidNotificationHandler
     : INotificationHandler
 {
-    public Task ReceiveNotificationAsync(NotificationMessage message, IDictionary<string, object> properties = null)
+    public event EventHandler<NotificationEventArgs> NotificationReceived;
+
+    public DefaultAndroidNotificationHandler()
+    {
+        CrossFirebasePushNotification.Current.OnNotificationReceived += (s, p) =>
+        {
+
+            var message = new NotificationMessage
+            {
+                Title = (string)p.Data["title"],
+                Body = (string)p.Data["body"],
+                Data = p.Data,
+                TimeStamp = DateTime.Now
+            };
+
+            // handle the received notification while app is in foreground
+            ReceiveNotificationAsync(message);
+
+            var args = new NotificationEventArgs
+            {
+                Message = message,
+                Platform = "Android"
+            };
+
+            // raise an abstracted event to the cross platform system
+            OnNotificationReceived(args);
+        };
+    }
+
+    protected void OnNotificationReceived(NotificationEventArgs e)
+    {
+        var handler = NotificationReceived;
+        handler?.Invoke(this, e);
+    }
+
+    // Since android has specific behavior for handling notifications while in foregournd, use this 
+    // method to raise a notification on device
+    private Task ReceiveNotificationAsync(NotificationMessage message, IDictionary<string, object> properties = null)
     {
         var context = MainApplication.Context;
         var channelId = MainActivity.CHANNEL_ID;

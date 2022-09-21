@@ -9,6 +9,8 @@ namespace NotificationHub.Maui.Services
 {
     public interface INotificationHandler
     {
-        Task ReceiveNotificationAsync(NotificationMessage message, IDictionary<string, object> properties = null);
+        event EventHandler<NotificationEventArgs> NotificationReceived;
+
+        //Task ReceiveNotificationAsync(NotificationMessage message, IDictionary<string, object> properties = null);
     }
 }

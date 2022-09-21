@@ -1,4 +1,5 @@
 ﻿using NotificationHub.Maui.Models;
+using NotificationHub.Maui.Services;
 using Plugin.FirebasePushNotification;
 
 namespace NotificationHub.Maui;
@@ -10,22 +11,6 @@ public partial class MainPage : ContentPage
     public MainPage()
     {
         InitializeComponent();
-
-//#if ANDROID
-//        CrossFirebasePushNotification.Current.OnNotificationReceived += (s, p) =>
-//        {
-//            var message = new NotificationMessage
-//            {
-//                Title = (string)p.Data["title"],
-//                Body = (string)p.Data["body"],
-//                Data = p.Data,
-//                TimeStamp = DateTime.Now
-//            };
-
-//            SetNotificationText(message);
-//        };
-//#endif
-
     }
 
     private void OnCounterClicked(object sender, EventArgs e)

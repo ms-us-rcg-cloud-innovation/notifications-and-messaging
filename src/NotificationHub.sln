@@ -7,19 +7,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apps", "apps", "{7D7F0BEE-7
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationHub.Maui", "apps\NotificationHub.Maui\NotificationHub.Maui.csproj", "{343B7E80-C527-44C3-9AC3-793301EBCC25}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libraries", "libraries", "{718503E8-4D6C-409B-A195-9F81EC2181A0}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationHub.Core", "libraries\NotificationHub.Core\NotificationHub.Core.csproj", "{333F321A-098D-4789-879E-9CD44986DD90}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationHub.Core.Maui", "libraries\NotificationHub.Core.Maui\NotificationHub.Core.Maui.csproj", "{840FF560-A214-45B7-BA79-A9BF96E46B8C}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{963BD133-15A8-4857-82F8-901274F5EC4A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationHub.Maui.UnitTests", "tests\NotificationHub.Maui.UnitTests\NotificationHub.Maui.UnitTests.csproj", "{4BFA8B24-BE17-4FF3-AA49-42444A01C05F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationHub.Core.Maui.UnitTests", "tests\NotificationHub.Core.Maui.UnitTests\NotificationHub.Core.Maui.UnitTests.csproj", "{39931347-0EA5-4002-AC86-22AEA9ECC11B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationHub.Core.UnitTests", "tests\NotificationHub.Core.UnitTests\NotificationHub.Core.UnitTests.csproj", "{0BB020BD-2BE5-47A5-B058-5EA7B6FE12DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,37 +22,17 @@ Global
 		{343B7E80-C527-44C3-9AC3-793301EBCC25}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{343B7E80-C527-44C3-9AC3-793301EBCC25}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{343B7E80-C527-44C3-9AC3-793301EBCC25}.Release|Any CPU.Build.0 = Release|Any CPU
-		{333F321A-098D-4789-879E-9CD44986DD90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{333F321A-098D-4789-879E-9CD44986DD90}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{333F321A-098D-4789-879E-9CD44986DD90}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{333F321A-098D-4789-879E-9CD44986DD90}.Release|Any CPU.Build.0 = Release|Any CPU
-		{840FF560-A214-45B7-BA79-A9BF96E46B8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{840FF560-A214-45B7-BA79-A9BF96E46B8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{840FF560-A214-45B7-BA79-A9BF96E46B8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{840FF560-A214-45B7-BA79-A9BF96E46B8C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4BFA8B24-BE17-4FF3-AA49-42444A01C05F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4BFA8B24-BE17-4FF3-AA49-42444A01C05F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BFA8B24-BE17-4FF3-AA49-42444A01C05F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BFA8B24-BE17-4FF3-AA49-42444A01C05F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{39931347-0EA5-4002-AC86-22AEA9ECC11B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{39931347-0EA5-4002-AC86-22AEA9ECC11B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{39931347-0EA5-4002-AC86-22AEA9ECC11B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{39931347-0EA5-4002-AC86-22AEA9ECC11B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0BB020BD-2BE5-47A5-B058-5EA7B6FE12DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0BB020BD-2BE5-47A5-B058-5EA7B6FE12DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0BB020BD-2BE5-47A5-B058-5EA7B6FE12DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0BB020BD-2BE5-47A5-B058-5EA7B6FE12DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{343B7E80-C527-44C3-9AC3-793301EBCC25} = {7D7F0BEE-75C8-4CB0-9748-20A4B0BB18AD}
-		{333F321A-098D-4789-879E-9CD44986DD90} = {718503E8-4D6C-409B-A195-9F81EC2181A0}
-		{840FF560-A214-45B7-BA79-A9BF96E46B8C} = {718503E8-4D6C-409B-A195-9F81EC2181A0}
 		{4BFA8B24-BE17-4FF3-AA49-42444A01C05F} = {963BD133-15A8-4857-82F8-901274F5EC4A}
-		{39931347-0EA5-4002-AC86-22AEA9ECC11B} = {963BD133-15A8-4857-82F8-901274F5EC4A}
-		{0BB020BD-2BE5-47A5-B058-5EA7B6FE12DB} = {963BD133-15A8-4857-82F8-901274F5EC4A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {577567FD-21DB-4EC8-950F-6A8D7470482C}

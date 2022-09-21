@@ -91,9 +91,4 @@
 	  <PackageReference Include="Plugin.FirebasePushNotification" Version="3.4.25" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\..\libraries\NotificationHub.Core.Maui\NotificationHub.Core.Maui.csproj" />
-	  <ProjectReference Include="..\..\libraries\NotificationHub.Core\NotificationHub.Core.csproj" />
-	</ItemGroup>
-
 </Project>

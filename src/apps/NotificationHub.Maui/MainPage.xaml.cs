@@ -1,24 +1,44 @@
-﻿namespace NotificationHub.Maui;
+﻿using NotificationHub.Maui.Models;
+using Plugin.FirebasePushNotification;
+
+namespace NotificationHub.Maui;
 
 public partial class MainPage : ContentPage
 {
-	int count = 0;
+    int count = 0;
 
-	public MainPage()
-	{
-		InitializeComponent();
-	}
+    public MainPage()
+    {
+        InitializeComponent();
 
-	private void OnCounterClicked(object sender, EventArgs e)
-	{
-		count++;
+//#if ANDROID
+//        CrossFirebasePushNotification.Current.OnNotificationReceived += (s, p) =>
+//        {
+//            var message = new NotificationMessage
+//            {
+//                Title = (string)p.Data["title"],
+//                Body = (string)p.Data["body"],
+//                Data = p.Data,
+//                TimeStamp = DateTime.Now
+//            };
 
-		if (count == 1)
-			CounterBtn.Text = $"Clicked {count} time";
-		else
-			CounterBtn.Text = $"Clicked {count} times";
+//            SetNotificationText(message);
+//        };
+//#endif
 
-		SemanticScreenReader.Announce(CounterBtn.Text);
-	}
+    }
+
+    private void OnCounterClicked(object sender, EventArgs e)
+    {
+        count++;
+
+
+        if (count == 1)
+            CounterBtn.Text = $"Clicked {count} time";
+        else
+            CounterBtn.Text = $"Clicked {count} times";
+
+        SemanticScreenReader.Announce(CounterBtn.Text);
+    }
 }
 

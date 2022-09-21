@@ -1,18 +1,19 @@
-﻿namespace NotificationHub.Maui;
+﻿
+using NotificationHub.Maui.Services;
+
+namespace NotificationHub.Maui;
+
 
 public static class MauiProgram
 {
-	public static MauiApp CreateMauiApp()
-	{
-		var builder = MauiApp.CreateBuilder();
-		builder
-			.UseMauiApp<App>()
+	public static MauiApp CreateMauiApp(MauiAppBuilder mauiAppBuilder)
+		=> mauiAppBuilder
+            .UseMauiApp<App>()			
 			.ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-			});
+			})
+            .Build();
 
-		return builder.Build();
-	}
 }

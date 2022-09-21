@@ -5,6 +5,8 @@ using Android.OS;
 using Android.Runtime;
 using AndroidX.Core.App;
 using Firebase;
+using NotificationHub.Core.Maui.Platforms.Android.Services.Impl;
+using NotificationHub.Maui.Services;
 using Plugin.FirebasePushNotification;
 using System.Security.Cryptography;
 
@@ -19,5 +21,14 @@ public class MainApplication : MauiApplication
 
     }
 
-    protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
+	protected override MauiApp CreateMauiApp() 
+	{
+		var mauiAppBuilder = MauiApp.CreateBuilder();
+
+        mauiAppBuilder.Services
+			.AddScoped<INotificationHandler, DefaultAndroidNotificationHandler>();
+
+        return MauiProgram.CreateMauiApp(mauiAppBuilder);
+    }
+	
 }

@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.NotificationHubs;
+﻿using Microsoft.AspNetCore.Mvc;
 using NotificationHub.Api.Models;
-using NotificationHub.Api.Services;
-using Notification = NotificationHub.Api.Models.Notification;
+using NotificationHub.Api.Providers;
 
 namespace NotificationHub.Api.Controllers
 {
@@ -11,19 +8,27 @@ namespace NotificationHub.Api.Controllers
     [ApiController]
     public class NotificationController : ControllerBase
     {
-        private readonly NotificationHubService _hubService;
+        private readonly AzureNotificationProvider _notificationProvider;
 
-        public NotificationController(NotificationHubService hubService)
+        public NotificationController(AzureNotificationProvider notificationProvider)
         {
-            _hubService = hubService;
+            _notificationProvider = notificationProvider;
         }
 
         [HttpPost]
         public async Task<IActionResult> PushNotificationAsync(Notification notification)
         {
-            var outcome = await _hubService.SendPushNotification(NotificationPlatform.Fcm, notification.Title, notification.Message);
+            try
+            {
+                var outcome = await _notificationProvider.SendNotification(notification);
 
-            return Ok(outcome);
+                return Ok(outcome);
+            }
+            catch(Exception e)
+            {
+                return Problem(e.Message);
+            }
+
         }
     }
 }

@@ -1,4 +1,7 @@
 using Microsoft.Azure.NotificationHubs;
+using NotificationHub.Api.Builders;
+using NotificationHub.Api.Builders.Interfaces;
+using NotificationHub.Api.Providers;
 using NotificationHub.Api.Services;
 using System.Runtime.CompilerServices;
 
@@ -12,6 +15,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<AzureNotificationProvider>();
+builder.Services.AddScoped<INotificationPayloadBuilder, NotificationPayloadBuilder>();
 
 builder.Services.AddScoped(sp =>
 {
@@ -22,6 +27,7 @@ builder.Services.AddScoped(sp =>
 
     return new NotificationHubService(client);
 });
+
 
 var app = builder.Build();
 

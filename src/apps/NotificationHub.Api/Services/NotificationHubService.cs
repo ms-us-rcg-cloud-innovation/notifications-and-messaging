@@ -13,22 +13,17 @@ public class NotificationHubService
         _client = client;
     }
 
-    public async Task<NotificationOutcome> SendPushNotification(NotificationPlatform platform, string title, string message)
+    public async Task<NotificationOutcome> SendNotification(string platform, string payload)
     {
-        var notification = new AndroidNotification
+        switch(platform)
         {
-            Notification = new Dictionary<string, string>
-            {
-                { "title", title },
-                { "body", message }
-            }
-        };
-
-        var jsonPayload = System.Text.Json.JsonSerializer.Serialize(notification, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
-
-        var outcome = await _client.SendFcmNativeNotificationAsync(jsonPayload);
-
-        return outcome;
+            case "fcm":
+                return await _client.SendFcmNativeNotificationAsync(payload);
+            case "aps":
+                return await _client.SendAppleNativeNotificationAsync(payload);
+            default:
+                throw new Exception("Invalid Platform");
+        }
     }
 
     public async Task UpsertDeviceRegistrationAsync(string id, string channel, NotificationPlatform platform, IList<string>? tags = null)

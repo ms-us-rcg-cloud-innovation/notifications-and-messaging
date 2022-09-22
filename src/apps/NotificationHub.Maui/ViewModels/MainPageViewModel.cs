@@ -15,17 +15,12 @@ namespace NotificationHub.Maui.ViewModels
         private readonly INotificationHandler _notificationHandler;
 
         [ObservableProperty]
-        string notificationMessage;
+        private string notificationMessage = "Notification message";
 
         public MainPageViewModel(INotificationHandler notificationHandler)
         {
             _notificationHandler = notificationHandler;
-            _notificationHandler.NotificationReceived += OnNotificationReceived;
-        }
-
-        private void OnNotificationReceived(object sender, NotificationEventArgs e)
-        {
-            notificationMessage = e.Message.Body;
+            _notificationHandler.NotificationReceived += (s, e) => { NotificationMessage = e.Message.Body; };
         }
     }
 }

@@ -23,35 +23,6 @@ namespace NotificationHub.Maui.Platforms.Android
         public MainActivity()
         {
 
-        }
-
-        //protected override void OnCreate(Bundle savedInstanceState)
-        //{
-        //    base.OnCreate(savedInstanceState);
-
-        //    CrossFirebasePushNotification.Current.OnNotificationReceived += (s, p) =>
-        //    {                
-        //        var message = new NotificationMessage
-        //        {
-        //            Title = (string)p.Data["title"],
-        //            Body = (string)p.Data["body"],
-        //            Data = p.Data,
-        //            TimeStamp = DateTime.Now
-        //        };
-
-        //        var properties = new Dictionary<string, object>()
-        //        {
-        //            { "context", this },
-        //            { "channel", CHANNEL_ID },
-        //            { "intent", typeof(MainActivity) }
-        //        };
-
-        //        _notificationHandler.ReceiveNotificationAsync(message, properties); 
-
-        //        System.Diagnostics.Debug.WriteLine("Received");
-
-        //    };
-
-        //}  
+        } 
     }
 }

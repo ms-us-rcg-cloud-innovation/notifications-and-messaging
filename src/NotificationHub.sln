@@ -6,10 +6,15 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apps", "apps", "{7D7F0BEE-75C8-4CB0-9748-20A4B0BB18AD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationHub.Maui", "apps\NotificationHub.Maui\NotificationHub.Maui.csproj", "{343B7E80-C527-44C3-9AC3-793301EBCC25}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A250D34D-82B9-4E23-A06B-3C8FCBB0BCED} = {A250D34D-82B9-4E23-A06B-3C8FCBB0BCED}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{963BD133-15A8-4857-82F8-901274F5EC4A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationHub.Maui.UnitTests", "tests\NotificationHub.Maui.UnitTests\NotificationHub.Maui.UnitTests.csproj", "{4BFA8B24-BE17-4FF3-AA49-42444A01C05F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationHub.Api", "apps\NotificationHub.Api\NotificationHub.Api.csproj", "{A250D34D-82B9-4E23-A06B-3C8FCBB0BCED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +31,10 @@ Global
 		{4BFA8B24-BE17-4FF3-AA49-42444A01C05F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BFA8B24-BE17-4FF3-AA49-42444A01C05F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BFA8B24-BE17-4FF3-AA49-42444A01C05F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A250D34D-82B9-4E23-A06B-3C8FCBB0BCED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A250D34D-82B9-4E23-A06B-3C8FCBB0BCED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A250D34D-82B9-4E23-A06B-3C8FCBB0BCED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A250D34D-82B9-4E23-A06B-3C8FCBB0BCED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -33,6 +42,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{343B7E80-C527-44C3-9AC3-793301EBCC25} = {7D7F0BEE-75C8-4CB0-9748-20A4B0BB18AD}
 		{4BFA8B24-BE17-4FF3-AA49-42444A01C05F} = {963BD133-15A8-4857-82F8-901274F5EC4A}
+		{A250D34D-82B9-4E23-A06B-3C8FCBB0BCED} = {7D7F0BEE-75C8-4CB0-9748-20A4B0BB18AD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {577567FD-21DB-4EC8-950F-6A8D7470482C}

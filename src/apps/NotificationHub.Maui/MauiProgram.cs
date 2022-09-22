@@ -21,7 +21,7 @@ public static class MauiProgram
 
 	public static MauiAppBuilder RegisterViewModels(this MauiAppBuilder mauiAppBuilder)
 	{
-		mauiAppBuilder.Services.AddSingleton<MainPageViewModel>();
+		mauiAppBuilder.Services.AddScoped<MainPageViewModel>();
 
 		return mauiAppBuilder;
 	}

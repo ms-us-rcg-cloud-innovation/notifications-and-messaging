@@ -5,6 +5,7 @@ using Android.OS;
 using AndroidX.Core.App;
 using NotificationHub.Maui.Models;
 using NotificationHub.Maui.Platforms.Android;
+using NotificationHub.Maui.Platforms.Android.Helpers;
 using NotificationHub.Maui.Services;
 using Plugin.FirebasePushNotification;
 using System;
@@ -35,14 +36,11 @@ public class DefaultAndroidNotificationHandler
                 TimeStamp = DateTime.Now
             };
 
-            var args = new NotificationEventArgs
-            {
-                Message = message,
-                Platform = "Android"
-            };
+            // capture notification while app is active 
+            NotificationHelpers.RaiseSystemNotificationWhileInForeground(message);
 
             // raise an abstracted event to the cross platform system
-            OnNotificationReceived(args);
+            OnNotificationReceived(new(message, "Android"));
         };
     }
 

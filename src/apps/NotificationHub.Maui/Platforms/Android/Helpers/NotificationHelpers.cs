@@ -11,30 +11,24 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NotificationHub.Maui.Platforms.Android.Helper
+namespace NotificationHub.Maui.Platforms.Android.Helpers
 {
     internal static class NotificationHelpers
     {
 
         // Since android has specific behavior for handling notifications while in foregournd, use this 
         // method to raise a notification on device
-        public static void RaiseSystemNotificationWhileInForeground(object sender, NotificationEventArgs e)
+        public static void RaiseSystemNotificationWhileInForeground(NotificationMessage message)
         {
-            var message = e.Message;
+            var notificationManager = NotificationManager.FromContext(MainApplication.Context);
 
-            var context = MainApplication.Context;
-            var channelId = MainActivity.CHANNEL_ID;
-            var intentType = typeof(MainActivity);
+            CreateNotificationChannel(notificationManager, Constants.NOTIFICATION_CHANNEL_ID);
 
-            var notificationManager = NotificationManager.FromContext(context);
-
-            CreateNotificationChannel(notificationManager, channelId);
-
-            var intent = new Intent(context, intentType);
+            var intent = new Intent(MainApplication.Context, typeof(MainActivity));
             intent.AddFlags(ActivityFlags.ClearTop);
-            var pendingIntent = PendingIntent.GetActivity(context, 0, intent, PendingIntentFlags.OneShot);
+            var pendingIntent = PendingIntent.GetActivity(MainApplication.Context, 0, intent, PendingIntentFlags.OneShot);
 
-            var notificationBuilder = new NotificationCompat.Builder(context, channelId);
+            var notificationBuilder = new NotificationCompat.Builder(MainApplication.Context, Constants.NOTIFICATION_CHANNEL_ID);
 
             notificationBuilder.SetContentTitle(message.Title)
                         .SetSmallIcon(NotificationHub.Maui.Resource.Drawable.ic_mtrl_checked_circle)
@@ -62,7 +56,7 @@ namespace NotificationHub.Maui.Platforms.Android.Helper
                 return;
             }
 
-            var channel = new NotificationChannel(channelId, "FCM Notifications", NotificationImportance.Default)
+            var channel = new NotificationChannel(channelId, channelId, NotificationImportance.Default)
             {
                 Description = "Firebase Cloud Messages appear in this channel"
             };

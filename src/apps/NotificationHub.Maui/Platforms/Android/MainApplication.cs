@@ -7,7 +7,7 @@ using AndroidX.Core.App;
 using Firebase;
 using NotificationHub.Core.Maui.Platforms.Android.Services.Impl;
 using NotificationHub.Maui.Models;
-using NotificationHub.Maui.Platforms.Android.Helper;
+using NotificationHub.Maui.Platforms.Android.Helpers;
 using NotificationHub.Maui.Services;
 using Plugin.FirebasePushNotification;
 using System.Security.Cryptography;
@@ -28,14 +28,7 @@ public class MainApplication : MauiApplication
         var mauiAppBuilder = MauiApp.CreateBuilder();
 
         mauiAppBuilder.Services
-            .AddScoped<INotificationHandler>(sp =>
-            {
-                var droidNotifyHandler = new DefaultAndroidNotificationHandler();
-
-                droidNotifyHandler.NotificationReceived += NotificationHelpers.RaiseSystemNotificationWhileInForeground;
-
-                return droidNotifyHandler;
-            });
+            .AddScoped<INotificationHandler, DefaultAndroidNotificationHandler>();
 
         return MauiProgram.CreateMauiApp(mauiAppBuilder);
     }

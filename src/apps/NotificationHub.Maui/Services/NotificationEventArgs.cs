@@ -10,7 +10,14 @@ namespace NotificationHub.Maui.Services
     public class NotificationEventArgs
         : EventArgs
     {
-        public NotificationMessage Message { get; set; }
-        public string Platform { get; set; }
+        public NotificationEventArgs(NotificationMessage message, string platform)
+            : base()
+        {
+            Message = message;
+            Platform = platform;            
+        }
+
+        public NotificationMessage Message { get; }
+        public string Platform { get; }
     }
 }

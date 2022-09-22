@@ -16,26 +16,24 @@ namespace NotificationHub.Api.Providers
         }
 
         public async Task<Microsoft.Azure.NotificationHubs.NotificationOutcome> SendNotification(Notification notification)
-        {
-            string payload = null;
+            => await _hubService.SendNotification(notification.Platform, CreateRawPayload(notification));
+        
 
+        private string CreateRawPayload(Notification notification)
+        {
             _payloadBuilder
                 .AddTitle(notification.Title)
                 .AddBody(notification.Message);
 
-            switch(notification.Platform)
+            switch (notification.Platform)
             {
                 case "fcm":
-                    payload = _payloadBuilder.BuildAndroidPayload();
-                    break;
+                    return _payloadBuilder.BuildAndroidPayload();
                 case "aps":
-                    payload = _payloadBuilder.BuildApplePayload();
-                    break;
+                    return _payloadBuilder.BuildApplePayload();
                 default:
                     throw new Exception("Invalid platform");
             }
-
-            return await _hubService.SendNotification(notification.Platform, payload);
         }
     }
 }

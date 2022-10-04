@@ -14,7 +14,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{963BD133
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationHub.Maui.UnitTests", "tests\NotificationHub.Maui.UnitTests\NotificationHub.Maui.UnitTests.csproj", "{4BFA8B24-BE17-4FF3-AA49-42444A01C05F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationHub.Api", "apps\NotificationHub.Api\NotificationHub.Api.csproj", "{A250D34D-82B9-4E23-A06B-3C8FCBB0BCED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationHub.Api", "apps\NotificationHub.Api\NotificationHub.Api.csproj", "{A250D34D-82B9-4E23-A06B-3C8FCBB0BCED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationFunctions", "apps\NotificationHub.Functions\NotificationFunctions\NotificationFunctions.csproj", "{A9A68750-CF0A-4666-A989-4A612A0CC02E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +37,10 @@ Global
 		{A250D34D-82B9-4E23-A06B-3C8FCBB0BCED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A250D34D-82B9-4E23-A06B-3C8FCBB0BCED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A250D34D-82B9-4E23-A06B-3C8FCBB0BCED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9A68750-CF0A-4666-A989-4A612A0CC02E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9A68750-CF0A-4666-A989-4A612A0CC02E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9A68750-CF0A-4666-A989-4A612A0CC02E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9A68750-CF0A-4666-A989-4A612A0CC02E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

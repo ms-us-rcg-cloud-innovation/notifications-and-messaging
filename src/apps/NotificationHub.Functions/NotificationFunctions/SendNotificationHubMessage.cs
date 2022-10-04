@@ -10,11 +10,11 @@ using Newtonsoft.Json;
 
 namespace NotificationFunctions
 {
-    public static class Function1
+    public static class SendNotificationHubMessage
     {
         [FunctionName("SendNotificationHubMessage")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");

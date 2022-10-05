@@ -1,25 +1,30 @@
 using Microsoft.Azure.NotificationHubs;
-using NotificationHub.Api.Builders;
-using NotificationHub.Api.Builders.Interfaces;
-using NotificationHub.Api.Providers;
-using NotificationHub.Api.Services;
+using NotificationHub.Core.Builders;
+using NotificationHub.Core.Builders.Interfaces;
+using NotificationHub.Core.Providers;
+using NotificationHub.Core.Services;
 using System.Runtime.CompilerServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add environment variables to our configuration provider
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+// Add 
 builder.Services.AddScoped<AzureNotificationProvider>();
 builder.Services.AddScoped<INotificationPayloadBuilder, NotificationPayloadBuilder>();
 
 builder.Services.AddScoped(sp =>
 {
+    // Retrieve values from configuration provider -- ours are stored in environment 
+    // variables configured in our launchSettings.json (which is also in our .gitignore)
     var hubName = builder.Configuration.GetValue<string>("NOTIFICATION_HUB_NAME");
     var connectionString = builder.Configuration.GetValue<string>("NOTIFICATION_HUB_CS");
 

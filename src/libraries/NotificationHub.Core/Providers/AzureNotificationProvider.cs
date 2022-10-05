@@ -1,8 +1,8 @@
 ﻿using NotificationHub.Api.Builders.Interfaces;
-using NotificationHub.Api.Models;
-using NotificationHub.Api.Services;
+using NotificationHub.Core.Providers.Models;
+using NotificationHub.Core.Services;
 
-namespace NotificationHub.Api.Providers
+namespace NotificationHub.Core.Providers
 {
     public class AzureNotificationProvider
     {

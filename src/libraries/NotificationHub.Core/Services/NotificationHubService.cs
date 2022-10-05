@@ -1,8 +1,8 @@
 ﻿using Microsoft.Azure.NotificationHubs;
-using NotificationHub.Api.Services.Models;
+using NotificationHub.Core.Services.Models;
 using System.Text.Json;
 
-namespace NotificationHub.Api.Services;
+namespace NotificationHub.Core.Services;
 
 public class NotificationHubService
 {

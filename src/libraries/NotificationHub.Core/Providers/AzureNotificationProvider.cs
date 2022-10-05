@@ -1,4 +1,4 @@
-﻿using NotificationHub.Api.Builders.Interfaces;
+﻿using NotificationHub.Core.Builders.Interfaces;
 using NotificationHub.Core.Providers.Models;
 using NotificationHub.Core.Services;
 

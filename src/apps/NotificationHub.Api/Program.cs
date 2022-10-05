@@ -17,7 +17,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-// Add 
+// Add required abstraction layers for connecting to notification-hub
 builder.Services.AddScoped<AzureNotificationProvider>();
 builder.Services.AddScoped<INotificationPayloadBuilder, NotificationPayloadBuilder>();
 

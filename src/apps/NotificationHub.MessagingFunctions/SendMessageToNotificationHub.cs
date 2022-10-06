@@ -29,6 +29,12 @@ namespace NotificationHub.MessagingFunctions
             try
             {
                 Notification? notification = await request.ReadFromJsonAsync<Notification>();
+
+                if(notification is null)
+                {
+                    return await request.CreateErrorResponseAsync("No content in request");
+                }
+
                 var outcome = await _notificationProvider.SendNotification(notification);
 
                 return await request.CreateOkResponseAsync(outcome);
@@ -36,10 +42,8 @@ namespace NotificationHub.MessagingFunctions
             }
             catch (Exception e)
             {
-
+                return await request.CreateErrorResponseAsync(e.Message, HttpStatusCode.InternalServerError);
             }
-
-            return null;
         }
     }
 }

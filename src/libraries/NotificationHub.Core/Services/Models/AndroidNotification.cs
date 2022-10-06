@@ -1,4 +1,4 @@
-﻿namespace NotificationHub.Api.Services.Models
+﻿namespace NotificationHub.Core.Services.Models
 {
     public class AndroidNotification
     {

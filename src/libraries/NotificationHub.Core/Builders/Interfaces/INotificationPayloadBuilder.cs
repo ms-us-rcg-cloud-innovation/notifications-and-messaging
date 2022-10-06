@@ -1,4 +1,4 @@
-﻿namespace NotificationHub.Api.Builders.Interfaces
+﻿namespace NotificationHub.Core.Builders.Interfaces
 {
     public interface INotificationPayloadBuilder
     {

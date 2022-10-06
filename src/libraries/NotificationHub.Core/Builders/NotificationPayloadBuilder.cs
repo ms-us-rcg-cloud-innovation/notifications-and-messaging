@@ -1,6 +1,6 @@
-﻿using NotificationHub.Api.Builders.Interfaces;
+﻿using NotificationHub.Core.Builders.Interfaces;
 
-namespace NotificationHub.Api.Builders
+namespace NotificationHub.Core.Builders
 {
     public class NotificationPayloadBuilder
         : INotificationPayloadBuilder

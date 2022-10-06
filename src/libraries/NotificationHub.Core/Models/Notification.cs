@@ -1,4 +1,4 @@
-﻿namespace NotificationHub.Api.Models;
+﻿namespace NotificationHub.Core.Models;
 
 public class Notification
 {

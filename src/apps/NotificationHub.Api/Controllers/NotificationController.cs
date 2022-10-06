@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NotificationHub.Api.Models;
-using NotificationHub.Api.Providers;
+using NotificationHub.Core.Models;
+using NotificationHub.Core.Providers;
 
 namespace NotificationHub.Api.Controllers
 {
@@ -26,7 +26,7 @@ namespace NotificationHub.Api.Controllers
             }
             catch(Exception e)
             {
-                return Problem(e.Message);
+                return BadRequest(e.Message);
             }
 
         }

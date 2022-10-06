@@ -27,7 +27,10 @@ namespace NotificationHub.MessagingFunctions
             var response = request.CreateResponse();
             try
             {
-                var notification = await request.ReadFromJsonAsync<Notification>();
+                Notification? notification = await request.ReadFromJsonAsync<Notification>();
+
+
+
                 var outcome = await _notificationProvider.SendNotification(notification);
 
                 response.StatusCode = HttpStatusCode.OK;
@@ -36,7 +39,7 @@ namespace NotificationHub.MessagingFunctions
             }
             catch (Exception e)
             {
-                response.StatusCode = HttpStatusCode.OK;
+                response.StatusCode = HttpStatusCode.BadRequest;
                 await response.WriteStringAsync(e.Message);
             }
 

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NotificationHub.Core.Providers.Models;
+using NotificationHub.Core.Models;
 using NotificationHub.Core.Providers;
 
 namespace NotificationHub.Api.Controllers

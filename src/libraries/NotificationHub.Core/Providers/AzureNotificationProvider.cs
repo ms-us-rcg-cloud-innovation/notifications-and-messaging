@@ -1,5 +1,5 @@
 ﻿using NotificationHub.Core.Builders.Interfaces;
-using NotificationHub.Core.Providers.Models;
+using NotificationHub.Core.Models;
 using NotificationHub.Core.Services;
 
 namespace NotificationHub.Core.Providers

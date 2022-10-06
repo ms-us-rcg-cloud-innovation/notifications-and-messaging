@@ -6,7 +6,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using NotificationHub.Core.FunctionHelpers;
 using NotificationHub.Core.Providers;
-using NotificationHub.Core.Providers.Models;
+using NotificationHub.Core.Models;
 
 namespace NotificationHub.MessagingFunctions
 {

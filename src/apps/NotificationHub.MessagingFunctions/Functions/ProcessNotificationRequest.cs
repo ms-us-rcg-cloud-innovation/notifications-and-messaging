@@ -28,6 +28,7 @@ namespace NotificationHub.MessagingFunctions.Functions
         {
             await Parallel.ForEachAsync(input, async (n, ct) =>
             {
+                _logger.LogInformation("Sending message to Notification Hub");
                 await _notificationProvider.SendNotificationAsync(n);
             });
         }

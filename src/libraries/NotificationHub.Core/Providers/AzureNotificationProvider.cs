@@ -15,7 +15,7 @@ namespace NotificationHub.Core.Providers
             _payloadBuilder = payloadBuilder;
         }
 
-        public async Task<Microsoft.Azure.NotificationHubs.NotificationOutcome> SendNotification(Notification notification)
+        public async Task<Microsoft.Azure.NotificationHubs.NotificationOutcome> SendNotificationAsync(Notification notification)
             => await _hubService.SendNotification(notification.Platform, CreateRawPayload(notification));
         
 

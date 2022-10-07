@@ -20,7 +20,7 @@ namespace NotificationHub.Api.Controllers
         {
             try
             {
-                var outcome = await _notificationProvider.SendNotification(notification);
+                var outcome = await _notificationProvider.SendNotificationAsync(notification);
 
                 return Ok(outcome);
             }

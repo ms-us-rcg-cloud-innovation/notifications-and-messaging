@@ -5,24 +5,22 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using NotificationHub.Core.FunctionHelpers;
-using NotificationHub.Core.Providers;
 using NotificationHub.Core.Models;
 using NotificationHub.MessagingFunctions.Models;
 
 namespace NotificationHub.MessagingFunctions.Functions
 {
-    public class PersistNotificationRequest
+    public class SaveOrderRequest
     {
-        private readonly AzureNotificationProvider _notificationProvider;
         private readonly ILogger _logger;
 
-        public PersistNotificationRequest(ILoggerFactory loggerFactory)
+        public SaveOrderRequest(ILoggerFactory loggerFactory)
         {
-            _logger = loggerFactory.CreateLogger<PersistNotificationRequest>();
+            _logger = loggerFactory.CreateLogger<SaveOrderRequest>();
         }
 
-        [Function(nameof(PersistNotificationRequest))]
-        public async Task<SendMessageResponseModel> RunAsync(
+        [Function(nameof(SaveOrderRequest))]
+        public async Task<OrderRequestMessageResponse> RunAsync(
             [HttpTrigger(AuthorizationLevel.Function
                          , "post"
                          , Route = "submit-request")] HttpRequestData request)
@@ -30,14 +28,14 @@ namespace NotificationHub.MessagingFunctions.Functions
             _logger.LogInformation("Http triggered function for processing notification submission");
             try
             {
-                var notification = await request.ReadFromJsonAsync<Notification>();
+                var broadcastMessage = await request.ReadFromJsonAsync<OrderRequestMessage>();
 
-                if (notification is null)
+                if (broadcastMessage is null)
                 {
                     return new(await request.CreateErrorResponseAsync("No content in request"));
                 }
 
-                return new(await request.CreateOkResponseAsync("Messaged persisted"), notification);
+                return new(await request.CreateOkResponseAsync("Messaged persisted"), broadcastMessage);
             }
             catch (Exception e)
             {

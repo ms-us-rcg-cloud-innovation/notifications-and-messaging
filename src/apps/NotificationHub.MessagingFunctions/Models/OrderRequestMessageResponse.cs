@@ -9,20 +9,20 @@ using System.Threading.Tasks;
 
 namespace NotificationHub.MessagingFunctions.Models
 {
-    public class SendMessageResponseModel
+    public class OrderRequestMessageResponse
     {
-        public SendMessageResponseModel(HttpResponseData httpResponse, Notification notification = null)
+        public OrderRequestMessageResponse(HttpResponseData httpResponse, OrderRequestMessage orderRequest = null)
         {
-            PersistedDated = notification;
+            OrderRequest = orderRequest;
             HttpResponse = httpResponse;
         }
 
         [CosmosDBOutput("%COSMOS_DB%"
-                      , "%COSMOS_CONTAINER%"
+                      , "%COSMOS_REQUEST_CONTAINER%"
                       , ConnectionStringSetting = "COSMOS_CONNECTION_STRING"
                       , PartitionKey = "/id"
                       , CreateIfNotExists = true)]
-        public Notification PersistedDated { get; }
+        public OrderRequestMessage OrderRequest { get; }
 
         public HttpResponseData HttpResponse { get;  }
     }

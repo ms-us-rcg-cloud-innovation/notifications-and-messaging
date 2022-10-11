@@ -1,5 +1,5 @@
 ﻿using Microsoft.Azure.NotificationHubs;
-using NotificationHub.Core.Services.Models;
+using NotificationHub.Core.Builders.Interfaces;
 using System.Text.Json;
 
 namespace NotificationHub.Core.Services;
@@ -7,13 +7,15 @@ namespace NotificationHub.Core.Services;
 public class NotificationHubService
 {
     private readonly INotificationHubClient _client;
+    private readonly NotificationHubService _hubService;
+    private readonly INotificationPayloadBuilder _payloadBuilder;
 
     public NotificationHubService(INotificationHubClient client)
     {
         _client = client;
     }
 
-    public async Task<NotificationOutcome> SendNotification(string platform, string payload)
+    public async Task<NotificationOutcome> SendNotificationAsync(string platform, string payload)
     {
         switch(platform)
         {

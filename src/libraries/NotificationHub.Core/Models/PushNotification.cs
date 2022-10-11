@@ -1,10 +1,10 @@
 ﻿namespace NotificationHub.Core.Models;
 
-public class Notification
+public class PushNotification
+    : NotificationMessageBase
 {
     public string Platform { get; set; }
-    public string Title { get; set; }
-    public string Message { get; set; }
+
     public string[] Tags { get; set; }
 }
 

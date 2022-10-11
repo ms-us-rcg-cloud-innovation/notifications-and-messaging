@@ -1,7 +1,7 @@
 using Microsoft.Azure.NotificationHubs;
 using NotificationHub.Core.Builders;
 using NotificationHub.Core.Builders.Interfaces;
-using NotificationHub.Core.Providers;
+
 using NotificationHub.Core.Services;
 using System.Runtime.CompilerServices;
 
@@ -18,7 +18,7 @@ builder.Services.AddSwaggerGen();
 
 
 // Add required abstraction layers for connecting to notification-hub
-builder.Services.AddScoped<AzureNotificationProvider>();
+
 builder.Services.AddScoped<INotificationPayloadBuilder, NotificationPayloadBuilder>();
 
 builder.Services.AddScoped(sp =>

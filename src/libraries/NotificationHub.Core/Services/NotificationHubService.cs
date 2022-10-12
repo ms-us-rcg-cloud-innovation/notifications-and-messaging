@@ -15,12 +15,12 @@ public class NotificationHubService
         _client = client;
     }
 
-    public async Task<NotificationOutcome> SendNotificationAsync(string platform, string payload)
+    public async Task<NotificationOutcome> SendNotificationAsync(string platform, string payload, IList<string> tags = null)
     {
         switch(platform)
         {
             case "fcm":
-                return await _client.SendFcmNativeNotificationAsync(payload);
+                return await _client.SendFcmNativeNotificationAsync(payload, tags);
             case "aps":
                 return await _client.SendAppleNativeNotificationAsync(payload);
             default:

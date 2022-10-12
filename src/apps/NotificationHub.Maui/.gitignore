@@ -16,7 +16,9 @@
 # Mono auto generated files
 mono_crash.*
 
+# Protected files
 [Pp]latforms/[Aa]ndroid/google-services.json
+Local.Constants.cs
 
 # Build results
 [Dd]ebug/

@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Android.Gms.Common.ModuleInstall.Internal;
 using Android.OS;
 using AndroidX.Core.App;
 //using Plugin.FirebasePushNotification;
@@ -24,7 +25,14 @@ namespace NotificationHub.Maui.Platforms.Android
             AzNH.NotificationHub.Start(this.Application, Local_Constants.HUB_NAME, Local_Constants.HUB_CONNECTIONSTRING);
 
             AzNH.NotificationHub.SetUserId("ted@contoso.com");
-            AzNH.NotificationHub.AddTags(new List<string> { "secret_demo", "tooling", "notify_me" });
+
+            var tags = AzNH.NotificationHub.Tags.ToEnumerable<string>();
+
+            if(tags.Count() == 0)
+            {
+                AzNH.NotificationHub.AddTags(new List<string> { "secret_demo", "tooling", "notify_me" });
+            }
+            
         }
     }
 }

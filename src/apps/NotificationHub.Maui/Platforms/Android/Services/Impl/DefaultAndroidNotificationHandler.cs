@@ -7,7 +7,7 @@ using NotificationHub.Maui.Models;
 using NotificationHub.Maui.Platforms.Android;
 using NotificationHub.Maui.Platforms.Android.Helpers;
 using NotificationHub.Maui.Services;
-using Plugin.FirebasePushNotification;
+//using Plugin.FirebasePushNotification;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,22 +26,22 @@ public class DefaultAndroidNotificationHandler
 
     public DefaultAndroidNotificationHandler()
     {
-        CrossFirebasePushNotification.Current.OnNotificationReceived += (s, p) =>
-        {
-            var message = new NotificationMessage
-            {
-                Title = (string)p.Data["title"],
-                Body = (string)p.Data["body"],
-                Data = p.Data,
-                TimeStamp = DateTime.Now
-            };
+        //CrossFirebasePushNotification.Current.OnNotificationReceived += (s, p) =>
+        //{
+        //    var message = new NotificationMessage
+        //    {
+        //        Title = (string)p.Data["title"],
+        //        Body = (string)p.Data["body"],
+        //        Data = p.Data,
+        //        TimeStamp = DateTime.Now
+        //    };
 
-            // capture notification while app is active 
-            NotificationHelpers.RaiseSystemNotificationWhileInForeground(message);
+        //    // capture notification while app is active 
+        //    NotificationHelpers.RaiseSystemNotificationWhileInForeground(message);
 
-            // raise an abstracted event to the cross platform system
-            OnNotificationReceived(new(message, "Android"));
-        };
+        //    // raise an abstracted event to the cross platform system
+        //    OnNotificationReceived(new(message, "Android"));
+        //};
     }
 
     protected void OnNotificationReceived(NotificationEventArgs e)

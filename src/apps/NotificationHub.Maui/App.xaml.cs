@@ -1,7 +1,7 @@
 ﻿using NotificationHub.Maui.Models;
 using NotificationHub.Maui.Services;
 using NotificationHub.Maui.ViewModels;
-using Plugin.FirebasePushNotification;
+//using Plugin.FirebasePushNotification;
 using System.Diagnostics;
 
 namespace NotificationHub.Maui;

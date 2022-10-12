@@ -9,7 +9,7 @@ using NotificationHub.Core.Maui.Platforms.Android.Services.Impl;
 using NotificationHub.Maui.Models;
 using NotificationHub.Maui.Platforms.Android.Helpers;
 using NotificationHub.Maui.Services;
-using Plugin.FirebasePushNotification;
+//using Plugin.FirebasePushNotification;
 using System.Security.Cryptography;
 
 namespace NotificationHub.Maui.Platforms.Android;

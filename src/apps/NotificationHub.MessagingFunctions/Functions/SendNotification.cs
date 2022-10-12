@@ -37,7 +37,7 @@ namespace NotificationHub.MessagingFunctions.Functions
 
             try
             {
-                PushNotification notification = await request.ReadFromJsonAsync<PushNotification>();
+                var notification = await request.ReadFromJsonAsync<PushNotification>();
 
                 if (notification is null)
                 {

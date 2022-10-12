@@ -1,31 +1,45 @@
 using System.Collections.Generic;
 using System.Net;
+using System.Runtime.InteropServices;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.NotificationHubs;
 using Microsoft.Extensions.Logging;
+using NotificationHub.Core.FunctionHelpers;
+using NotificationHub.Core.Services;
 
 namespace NotificationHub.MessagingFunctions.Functions
 {
     public class RegisterDevice
     {
         private readonly ILogger _logger;
+        private readonly NotificationHubService _hubService;
 
-        public RegisterDevice(ILoggerFactory loggerFactory)
+        public RegisterDevice(ILoggerFactory loggerFactory, NotificationHubService hubService)
         {
             _logger = loggerFactory.CreateLogger<RegisterDevice>();
+            _hubService = hubService;
         }
 
+        public record DeviceDetails(string DeviceHandle, NotificationPlatform Platform, IList<string> Tags, string Channel);
+
         [Function(nameof(RegisterDevice))]
-        public HttpResponseData Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
+        public async Task<HttpResponseData> Run(
+            [HttpTrigger(
+                AuthorizationLevel.Function
+             , "post"
+             , Route = "register-device")] HttpRequestData request)
         {
-            _logger.LogInformation("C# HTTP trigger function processed a request.");
+            var deviceDetails = await request.ReadFromJsonAsync<DeviceDetails>();
 
-            var response = req.CreateResponse(HttpStatusCode.OK);
-            response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
+            if(deviceDetails is null)
+            {
+                return await request.CreateErrorResponseAsync("No content in request");
+            }
 
-            response.WriteString("Welcome to Azure Functions!");
+            await _hubService.UpsertDeviceRegistrationAsync(deviceDetails.DeviceHandle, deviceDetails.Channel, deviceDetails.Platform, deviceDetails.Tags);
 
-            return response;
+            return await request.CreateOkResponseAsync("Device registered!");
         }
     }
 }

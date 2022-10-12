@@ -64,7 +64,7 @@ namespace NotificationHub.MessagingFunctions.Functions
                                             , options: new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
                                             , type: typeof(OrderRequestMessage))
                         
-                    };
+                    }; 
                      await sender.SendMessageAsync(sbMessage);
                 }
             });

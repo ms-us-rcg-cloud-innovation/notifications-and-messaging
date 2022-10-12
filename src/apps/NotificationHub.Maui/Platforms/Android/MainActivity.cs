@@ -17,14 +17,6 @@ namespace NotificationHub.Maui.Platforms.Android
 
         public MainActivity()
         {
-            //var channel = AzNH.NotificationHub.PushChannel;
-            // Set the delegate for receiving messages
-            AzNH.NotificationHub.SetListener(new NotificationListener());            
-            //AzNH.NotificationHub.SetUserId("sbanjanovic@microsoft.com");
-            //AzNH.NotificationHub.AddTag("sbanj");
-
-            AzNH.NotificationHub.Start(Application, _hubName, _hubConnectionString);
-
 
         } 
     }

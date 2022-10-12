@@ -14,8 +14,8 @@
 		<ApplicationTitle>NotificationHub.Maui</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>msft.RCG.NotificationHub</ApplicationId>
-		<ApplicationIdGuid>b91c8af8-8a36-4511-8284-12c08aadf4bd</ApplicationIdGuid>
+		<ApplicationId>msft.rcg.demo.notificationhub</ApplicationId>
+		<ApplicationIdGuid>DCF80497-4A0D-4067-AB1C-C7D6E8BD58B1</ApplicationIdGuid>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -84,11 +84,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Platforms\Android\google-services.json" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <GoogleServicesJson Include="Platforms\Android\google-services.json" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
+	  <PackageReference Include="Plugin.FirebasePushNotification" Version="3.4.35" />
 	</ItemGroup>
 
 </Project>

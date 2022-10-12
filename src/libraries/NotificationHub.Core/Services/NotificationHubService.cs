@@ -28,7 +28,7 @@ public class NotificationHubService
         }
     }
 
-    public async Task UpsertDeviceRegistrationAsync(string id, string channel, NotificationPlatform platform, IList<string>? tags = null)
+    public async Task UpsertDeviceRegistrationAsync(string id, string channel, NotificationPlatform platform, IList<string> tags = null)
     {
         var installation = CreateInstallation(id, channel, platform, tags);
 

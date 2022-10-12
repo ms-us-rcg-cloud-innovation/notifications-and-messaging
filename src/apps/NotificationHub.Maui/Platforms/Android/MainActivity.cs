@@ -17,7 +17,7 @@ namespace NotificationHub.Maui.Platforms.Android
 
         public MainActivity()
         {
-
+            //AzNH.NotificationHub.Start(this.Application, _hubName, _hubConnectionString);
         } 
     }
 }

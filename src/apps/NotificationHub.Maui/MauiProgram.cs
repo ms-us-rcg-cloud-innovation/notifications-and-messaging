@@ -7,9 +7,9 @@ namespace NotificationHub.Maui;
 
 public static class MauiProgram
 {
-	public static MauiApp CreateMauiApp(MauiAppBuilder mauiAppBuilder)
-		=> mauiAppBuilder
-			.UseMauiApp<App>()
+	public static MauiApp CreateMauiApp()
+		=> MauiApp.CreateBuilder()
+            .UseMauiApp<App>()
 			.ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -21,7 +21,7 @@ public static class MauiProgram
 
 	public static MauiAppBuilder RegisterViewModels(this MauiAppBuilder mauiAppBuilder)
 	{
-		mauiAppBuilder.Services.AddScoped<MainPageViewModel>();
+		mauiAppBuilder.Services.AddScoped<MainPageViewModel>(sp => new MainPageViewModel());
 
 		return mauiAppBuilder;
 	}

@@ -12,15 +12,23 @@ namespace NotificationHub.Maui.ViewModels
     public partial class MainPageViewModel
         : ObservableObject
     {
-        private readonly INotificationHandler _notificationHandler;
+        private INotificationHandler _notificationHandler;
 
-        [ObservableProperty]
-        private string notificationMessage = "Notification message";
-
-        public MainPageViewModel(INotificationHandler notificationHandler)
+        public MainPageViewModel()
         {
-            _notificationHandler = notificationHandler;
-            _notificationHandler.NotificationReceived += (s, e) => { NotificationMessage = e.Message.Body; };
+            Init();
+        }
+
+        partial void Init();
+
+        private string notificationMessage;
+        public string NotificationMessage
+        {
+            get => notificationMessage;
+            set
+            {
+                SetProperty(ref notificationMessage, value);
+            }
         }
     }
 }

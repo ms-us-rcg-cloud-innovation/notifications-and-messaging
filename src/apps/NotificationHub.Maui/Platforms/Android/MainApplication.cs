@@ -11,6 +11,8 @@ using NotificationHub.Maui.Platforms.Android.Helpers;
 using NotificationHub.Maui.Services;
 //using Plugin.FirebasePushNotification;
 using System.Security.Cryptography;
+using AzNH = WindowsAzure.Messaging.NotificationHubs;
+
 
 namespace NotificationHub.Maui.Platforms.Android;
 
@@ -25,11 +27,20 @@ public class MainApplication : MauiApplication
 
     protected override MauiApp CreateMauiApp()
     {
-        var mauiAppBuilder = MauiApp.CreateBuilder();
 
-        mauiAppBuilder.Services
-            .AddScoped<INotificationHandler, DefaultAndroidNotificationHandler>();
+        // local constants is a git ignored file
+        // create a class with those constants corresponding to your hub details
+        AzNH.NotificationHub.Start(this, Local_Constants.HUB_NAME, Local_Constants.HUB_CONNECTIONSTRING);
 
-        return MauiProgram.CreateMauiApp(mauiAppBuilder);
+        AzNH.NotificationHub.SetUserId("ted@contoso.com");
+
+        var tags = AzNH.NotificationHub.Tags.ToEnumerable<string>();
+
+        if (tags.Count() == 0)
+        {
+            AzNH.NotificationHub.AddTags(new List<string> { "secret_demo", "tooling", "notify_me" });
+        }
+
+        return MauiProgram.CreateMauiApp();
     }
 }

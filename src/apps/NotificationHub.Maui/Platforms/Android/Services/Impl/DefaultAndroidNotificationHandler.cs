@@ -26,8 +26,6 @@ public class DefaultAndroidNotificationHandler
 
     public DefaultAndroidNotificationHandler()
     {
-        CrossFirebasePushNotification.Current.RegisterForPushNotifications();
-
         CrossFirebasePushNotification.Current.OnNotificationReceived += (s, p) =>
         {
             var message = new NotificationMessage

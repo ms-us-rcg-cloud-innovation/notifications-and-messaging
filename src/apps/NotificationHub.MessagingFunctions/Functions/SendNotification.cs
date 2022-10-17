@@ -27,13 +27,13 @@ namespace NotificationHub.MessagingFunctions.Functions
         }
 
         [Function(nameof(SendNotification))]
-        public async Task<HttpResponseData> Run(
+        public async Task<HttpResponseData> RunAsync(
             [HttpTrigger(
                 AuthorizationLevel.Function
               , "post"
               , Route = "send-notification")] HttpRequestData request)
         {
-            _logger.LogInformation("Triggering send-notification endpoint");
+            _logger.LogInformation("Sending notification to targeted audiance");
 
             try
             {
@@ -41,11 +41,13 @@ namespace NotificationHub.MessagingFunctions.Functions
 
                 if (notification is null)
                 {
-                    return await request.CreateErrorResponseAsync("No content in request");
+                    return await request.CreateErrorResponseAsync("Incorrect notification message format");
                 }
 
                 var notificationPayload = CreateRawPayload(notification);
-                var outcome = await _hubService.SendNotificationAsync(notification.Platform, notificationPayload, notification.Tags);
+                var outcome = await _hubService.SendNotificationAsync(notification.Platform
+                                                                    , notificationPayload
+                                                                    , notification.Tags);
 
                 _logger.LogInformation("Message sent to Notification Hub");
 

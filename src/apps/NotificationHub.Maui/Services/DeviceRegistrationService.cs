@@ -18,8 +18,6 @@ namespace NotificationHub.Maui.Services
 
         public async Task<string> UpsertDeviceInstallationAsync(DeviceInstallation deviceInstallation)
         {   
-            //var requestQuery = QueryHelpers. 
-
             using var request = new HttpRequestMessage(HttpMethod.Post, $"?code={Local_Constants.REGISTRATION_FUNC_TOKEN}");
 
             

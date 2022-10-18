@@ -1,15 +1,10 @@
-using System.Collections.Generic;
-using System.Net;
-using Azure.Core;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Azure.NotificationHubs;
 using Microsoft.Extensions.Logging;
 using NotificationHub.Core.Builders.Interfaces;
 using NotificationHub.Core.FunctionHelpers;
-using NotificationHub.Core.Models;
 using NotificationHub.Core.Services;
-using static NotificationHub.MessagingFunctions.Functions.OrderRequestService;
+using System.Net;
 
 namespace NotificationHub.MessagingFunctions.Functions
 {
@@ -19,10 +14,12 @@ namespace NotificationHub.MessagingFunctions.Functions
         private readonly NotificationHubService _hubService;
         private readonly INotificationPayloadBuilder _payloadBuilder;
 
+        public record PushNotification(string Title, string Body, string Platform, string[] Tags);
+
         public SendNotification(ILogger<SendNotification> logger, NotificationHubService hubService, INotificationPayloadBuilder payloadBuilder)
         {
             _hubService = hubService;
-            _payloadBuilder = payloadBuilder;      
+            _payloadBuilder = payloadBuilder;
             _logger = logger;
         }
 
@@ -47,7 +44,7 @@ namespace NotificationHub.MessagingFunctions.Functions
 
                 var notificationPayload = CreateRawPayload(notification);
                 var outcome = await _hubService.SendNotificationAsync(notification.Platform
-                                                                    , notificationPayload                                                                    
+                                                                    , notificationPayload
                                                                     , cancellationToken
                                                                     , tags: notification.Tags);
 

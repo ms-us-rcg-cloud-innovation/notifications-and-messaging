@@ -7,8 +7,6 @@ namespace NotificationHub.Core.Services;
 public class NotificationHubService
 {
     private readonly INotificationHubClient _client;
-    private readonly NotificationHubService _hubService;
-    private readonly INotificationPayloadBuilder _payloadBuilder;
 
     public NotificationHubService(INotificationHubClient client)
     {

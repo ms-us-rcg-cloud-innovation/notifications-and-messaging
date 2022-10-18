@@ -1,11 +1,5 @@
 ﻿using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using NotificationHub.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NotificationHub.MessagingFunctions.Models
 {
@@ -24,6 +18,6 @@ namespace NotificationHub.MessagingFunctions.Models
                       , CreateIfNotExists = true)]
         public OrderRequestMessage OrderRequest { get; }
 
-        public HttpResponseData HttpResponse { get;  }
+        public HttpResponseData HttpResponse { get; }
     }
 }

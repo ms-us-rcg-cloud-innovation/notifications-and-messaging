@@ -26,7 +26,7 @@ namespace NotificationHub.Maui.Platforms.Android.Services.Impl
         public async Task<DeviceInstallation> GenerateDeviceInstallationAsync(params string[] tags)
             => new DeviceInstallation
                 {
-                    InstallationId = GetDeviceId(),
+                    Id = GetDeviceId(),
                     Platform = "fcm",
                     PushChannel = await GetTokenAsync(),
                     Tags = tags?.ToList()

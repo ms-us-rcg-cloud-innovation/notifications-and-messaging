@@ -1,10 +1,10 @@
-using System.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.NotificationHubs;
 using Microsoft.Extensions.Logging;
 using NotificationHub.Core.FunctionHelpers;
 using NotificationHub.Core.Services;
+using System.Net;
 
 namespace NotificationHub.MessagingFunctions.Functions
 {
@@ -20,7 +20,7 @@ namespace NotificationHub.MessagingFunctions.Functions
         private readonly ILogger _logger;
         private readonly NotificationHubService _hubService;
 
-        public record DeviceDetails(string InstallationId, string PushChannel, string Platform, IList<string> Tags);
+        public record DeviceDetails(string Id, string PushChannel, string Platform, IList<string> Tags);
 
         public RegisterDevice(ILogger<RegisterDevice> logger, NotificationHubService hubService)
         {
@@ -51,12 +51,12 @@ namespace NotificationHub.MessagingFunctions.Functions
                     return await request.CreateErrorResponseAsync(message);
                 }
 
-               
 
-                if(validPlatform)
+
+                if (validPlatform)
                 {
                     await _hubService.UpsertDeviceRegistrationAsync(
-                                                deviceDetails.InstallationId
+                                                deviceDetails.Id
                                               , deviceDetails.PushChannel
                                               , platform
                                               , cancellationToken
@@ -65,7 +65,7 @@ namespace NotificationHub.MessagingFunctions.Functions
 
                 return await request.CreateOkResponseAsync(deviceDetails);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 _logger.LogError(e, "Error during function execution time");
                 return await request.CreateErrorResponseAsync(e.Message, HttpStatusCode.InternalServerError);

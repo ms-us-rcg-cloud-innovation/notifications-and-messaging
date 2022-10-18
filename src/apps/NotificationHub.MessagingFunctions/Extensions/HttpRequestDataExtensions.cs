@@ -1,11 +1,6 @@
 ﻿using Microsoft.Azure.Functions.Worker.Http;
 using NotificationHub.MessagingFunctions.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NotificationHub.Core.FunctionHelpers
 {
@@ -30,7 +25,7 @@ namespace NotificationHub.Core.FunctionHelpers
             var response = request.CreateResponse(HttpStatusCode.InternalServerError);
             await response.WriteAsJsonAsync(content);
 
-            return response;            
+            return response;
         }
     }
 }

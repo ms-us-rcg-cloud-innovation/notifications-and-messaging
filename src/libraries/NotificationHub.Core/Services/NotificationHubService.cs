@@ -20,9 +20,9 @@ public class NotificationHubService
         switch(platform)
         {
             case "fcm":
-                return await _client.SendFcmNativeNotificationAsync(payload, tags, cancellationToken);
+                return tags?.Count > 0 ? await _client.SendFcmNativeNotificationAsync(payload, tags, cancellationToken) : await _client.SendFcmNativeNotificationAsync(payload, cancellationToken);
             case "aps":
-                return await _client.SendAppleNativeNotificationAsync(payload, tags, cancellationToken);
+                return tags?.Count > 0 ? await _client.SendAppleNativeNotificationAsync(payload, tags, cancellationToken) : await _client.SendAppleNativeNotificationAsync(payload, cancellationToken);
             default:
                 throw new Exception("Invalid Platform");
         }

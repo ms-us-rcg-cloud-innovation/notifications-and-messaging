@@ -10,21 +10,20 @@
             Padding="30,0"
             VerticalOptions="Center">
             <Label
-                Text="Hello, World!"
-                SemanticProperties.HeadingLevel="Level1"
-                FontSize="32"
+                x:Name="NotificationLbl"
+                HorizontalTextAlignment="Start"
+                Text="Notification:"                
+                SemanticProperties.HeadingLevel="Level2"
+                FontSize="18"
                 HorizontalOptions="Center" />
-            <Border Stroke="LightGray"
-                    StrokeThickness="2"
-                    Padding="8,1,1,4"
-                    StrokeShape="RoundRectangle 5,5,5,5"
-                    >
-                <Entry 
-                Placeholder="Change User"
-                PlaceholderColor="BlueViolet"
-                Text="{Binding UserId}"
-                />
-            </Border>
+            <Label
+                x:Name="NotificationContentLbl"
+                HorizontalTextAlignment="Start"
+                Text="{Binding NotificationMessage, StringFormat='{0}'}"                
+                SemanticProperties.HeadingLevel="Level2"
+                FontSize="14"
+                HorizontalOptions="Center" />
+
             <Border Stroke="LightGray"
                     StrokeThickness="2"
                     Padding="8,1,1,4"
@@ -37,35 +36,11 @@
             </Border>
             <Button                
                 x:Name="AddTagsBtn"
-                Text="Register User"
-                SemanticProperties.Hint="Commits changes to Notification Hub"
+                Text="Update Registration"
+                SemanticProperties.Hint="Updates Notification Hub Installation vai backend api"
                 Command="{Binding RegisterUserCommand}"
                 HorizontalOptions="Center" />
 
-            <!--<Label
-                Text="{Binding CurrentUser, StringFormat='User: {0}'}"
-                FontSize="16"
-                HorizontalTextAlignment="Start"
-                FontAttributes="Italic" />
-            <Label
-                Text="{Binding TagList, StringFormat='Tags: {0}'}"
-                HorizontalTextAlignment="Start"
-                FontSize="16"
-                FontAttributes="Italic" />-->
-            <Label
-                x:Name="NotificationLbl"
-                HorizontalTextAlignment="Start"
-                Text="Notification:"                
-                SemanticProperties.HeadingLevel="Level2"
-                FontSize="16"
-                HorizontalOptions="Center" />
-            <Label
-                x:Name="NotificationContentLbl"
-                HorizontalTextAlignment="Start"
-                Text="{Binding NotificationMessage, StringFormat='{0}'}"                
-                SemanticProperties.HeadingLevel="Level2"
-                FontSize="14"
-                HorizontalOptions="Center" />
 
         </VerticalStackLayout>
     </ScrollView>

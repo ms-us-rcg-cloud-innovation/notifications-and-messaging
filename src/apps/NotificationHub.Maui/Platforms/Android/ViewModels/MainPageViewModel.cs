@@ -42,7 +42,7 @@ namespace NotificationHub.Maui.ViewModels
 
         private async Task<string> RegisterDeviceInstallationAsync()
         {
-            var tagList = Tags?.Split(",") ?? new string[0];
+            var tagList = Tags?.Split(",").Select(x => x.Trim()).ToArray() ?? new string[0];
 
             var installation = await _deviceInstallationService.GenerateDeviceInstallationAsync(tagList);
             var outcome = await _deviceRegistrationService.UpsertDeviceInstallationAsync(installation);
@@ -55,6 +55,7 @@ namespace NotificationHub.Maui.ViewModels
             CrossFirebasePushNotification.Current.OnTokenRefresh += async (sender, args) =>
             {
                 await _deviceInstallationService.SetTokenAsync(args.Token);
+                _logger.LogDebug($"Channel: {args.Token}");
                 var outcome = await RegisterDeviceInstallationAsync();
 
                 _logger.LogInformation($"Registration outcome: {outcome}");

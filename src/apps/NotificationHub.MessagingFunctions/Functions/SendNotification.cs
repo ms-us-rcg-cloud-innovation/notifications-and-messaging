@@ -1,10 +1,12 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.NotificationHubs;
 using Microsoft.Extensions.Logging;
 using NotificationHub.Core.Builders.Interfaces;
 using NotificationHub.Core.FunctionHelpers;
 using NotificationHub.Core.Services;
 using System.Net;
+using static NotificationHub.MessagingFunctions.Functions.RegisterDevice;
 
 namespace NotificationHub.MessagingFunctions.Functions
 {
@@ -14,7 +16,7 @@ namespace NotificationHub.MessagingFunctions.Functions
         private readonly NotificationHubService _hubService;
         private readonly INotificationPayloadBuilder _payloadBuilder;
 
-        public record PushNotification(string Title, string Body, string Platform, string[] Tags);
+        public record NotificationRequest(string Title, string Body, string Platform, string[] Tags, string TagExpression);
 
         public SendNotification(ILogger<SendNotification> logger, NotificationHubService hubService, INotificationPayloadBuilder payloadBuilder)
         {
@@ -35,15 +37,24 @@ namespace NotificationHub.MessagingFunctions.Functions
 
             try
             {
-                var notification = await request.ReadFromJsonAsync<PushNotification>();
+                var notification = await request.ReadFromJsonAsync<NotificationRequest>();
 
                 if (notification is null)
                 {
                     return await request.CreateErrorResponseAsync("Incorrect notification message format");
                 }
+                bool validPlatform = RequestHelpers.PlatformEnumLookup.TryGetValue(notification.Platform.ToLower(), out var platform);
+
+                if (!validPlatform)
+                {
+
+                    var message = $"Platform is invalid {notification.Platform}";
+                    _logger.LogError(message);
+                    return await request.CreateErrorResponseAsync(message);
+                }
 
                 var notificationPayload = CreateRawPayload(notification);
-                var outcome = await _hubService.SendNotificationAsync(notification.Platform
+                var outcome = await _hubService.SendNotificationAsync(platform
                                                                     , notificationPayload
                                                                     , cancellationToken
                                                                     , tags: notification.Tags);
@@ -61,7 +72,7 @@ namespace NotificationHub.MessagingFunctions.Functions
         }
 
 
-        private string CreateRawPayload(PushNotification notification)
+        private string CreateRawPayload(NotificationRequest notification)
         {
             _payloadBuilder
                 .AddTitle(notification.Title)

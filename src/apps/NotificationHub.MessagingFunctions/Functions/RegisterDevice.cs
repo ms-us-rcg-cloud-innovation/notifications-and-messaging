@@ -10,13 +10,6 @@ namespace NotificationHub.MessagingFunctions.Functions
 {
     public class RegisterDevice
     {
-        private static readonly Dictionary<string, NotificationPlatform> _platformEnumLookup = new()
-        {
-            {"fcm", NotificationPlatform.Fcm },
-            {"gcm", NotificationPlatform.Fcm },
-            {"apns", NotificationPlatform.Apns }
-        };
-
         private readonly ILogger _logger;
         private readonly NotificationHubService _hubService;
 
@@ -41,7 +34,7 @@ namespace NotificationHub.MessagingFunctions.Functions
             try
             {
                 var deviceDetails = await request.ReadFromJsonAsync<DeviceDetails>();
-                bool validPlatform = _platformEnumLookup.TryGetValue(deviceDetails.Platform.ToLower(), out var platform);
+                bool validPlatform = RequestHelpers.PlatformEnumLookup.TryGetValue(deviceDetails.Platform.ToLower(), out var platform);
 
                 if (deviceDetails is null || !validPlatform)
                 {

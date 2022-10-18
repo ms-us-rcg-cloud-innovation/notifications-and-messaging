@@ -1,19 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using NotificationHub.Maui.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using UIKit;
 
 namespace NotificationHub.Maui.Services
 {
     public class DeviceRegistrationService
     {
-        private const string REGISTER_DEVICE_ROUTE = "register-device";
-
         private readonly ILogger<DeviceRegistrationService> _logger;
         private readonly HttpClient _client;
 
@@ -25,7 +17,7 @@ namespace NotificationHub.Maui.Services
 
         public async Task<string> UpsertDeviceInstallationAsync(DeviceInstallation deviceInstallation)
         {            
-            using var request = new HttpRequestMessage(HttpMethod.Post, REGISTER_DEVICE_ROUTE);
+            using var request = new HttpRequestMessage(HttpMethod.Post, "/");
             request.Content = new StringContent(JsonSerializer.Serialize(deviceInstallation));
             using var response = await _client.SendAsync(request);
 

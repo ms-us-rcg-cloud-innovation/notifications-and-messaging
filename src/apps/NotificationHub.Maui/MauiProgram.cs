@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.Extensions.Configuration;
 using NotificationHub.Maui.Services;
 using NotificationHub.Maui.ViewModels;
 
@@ -19,13 +20,22 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			})
-			.RegisterViewModels()
+			.RegisterServices()
             .Build();
 
 
-	public static MauiAppBuilder RegisterViewModels(this MauiAppBuilder mauiAppBuilder)
+	public static MauiAppBuilder RegisterServices(this MauiAppBuilder mauiAppBuilder)
 	{
-		mauiAppBuilder.Services.AddScoped<MainPageViewModel>(sp => new MainPageViewModel());
+		mauiAppBuilder.Services
+			.AddScoped<MainPageViewModel>()
+			.AddScoped<DeviceRegistrationService>()
+			.AddSingleton<HttpClient>(sp =>
+			{
+				HttpClient client = new();
+				client.BaseAddress = new Uri(Local_Constants.REGISTRATION_UPSERT_ENDPOINT);
+
+				return client;
+			});
 
 		return mauiAppBuilder;
 	}

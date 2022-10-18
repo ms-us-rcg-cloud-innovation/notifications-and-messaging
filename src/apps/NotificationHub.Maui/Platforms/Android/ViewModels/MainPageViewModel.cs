@@ -1,16 +1,12 @@
-﻿using Android.Gms.Common;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
-using NotificationHub.Core.Maui.Platforms.Android.Services.Impl;
 using NotificationHub.Maui.Models;
 using NotificationHub.Maui.Platforms.Android;
 using NotificationHub.Maui.Platforms.Android.Helpers;
 using Plugin.FirebasePushNotification;
 using System.Windows.Input;
 using WindowsAzure.Messaging.NotificationHubs;
-using static Android.Provider.Settings;
-using AzNH = WindowsAzure.Messaging.NotificationHubs;
 
 namespace NotificationHub.Maui.ViewModels
 {
@@ -24,9 +20,10 @@ namespace NotificationHub.Maui.ViewModels
 
         partial void Init()
         {
+
+            FirebasePushNotificationManager.Initialize(MainApplication.Context, true);
             RegisterFcmTokenRefreshHandler();
             RegisterNotificationReceivedHandler();
-            FirebasePushNotificationManager.Initialize(MainApplication.Context, true);
 
             RegisterUserCommand = new AsyncRelayCommand(RegisterUserAsync);
         }

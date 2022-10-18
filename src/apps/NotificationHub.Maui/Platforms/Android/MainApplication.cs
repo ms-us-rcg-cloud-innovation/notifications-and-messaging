@@ -22,6 +22,7 @@ public class MainApplication : MauiApplication
     {
         var appBuilder = MauiApp.CreateBuilder();
         appBuilder.Services.AddScoped<IDeviceInstallationService, AndroidDeviceInstallationService>();
+
         return MauiProgram.CreateMauiApp(appBuilder);
     }
 

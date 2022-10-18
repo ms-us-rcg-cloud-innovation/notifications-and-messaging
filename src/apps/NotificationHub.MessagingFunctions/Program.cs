@@ -24,16 +24,6 @@ var host = new HostBuilder()
 
             return new NotificationHubService(client);
         });
-
-        // add azure communication service
-        services.AddScoped(sp =>
-        {
-            var connectionString = context.Configuration.GetConnectionString("AZURE_COMM_SERVICES_CS");
-
-            var client = new SmsClient(connectionString);
-
-            return new SmsCommunicationService(client);
-        });
     })
     .Build();
 

@@ -20,7 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationHub.Core", "lib
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libraries", "libraries", "{8F7A9520-B8BF-4617-9154-E057AACD7480}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationHub.MessagingFunctions", "apps\NotificationHub.MessagingFunctions\NotificationHub.MessagingFunctions.csproj", "{1A4B801A-E1F8-40EF-ADC9-7F7A7A6853D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationHub.MessagingFunctions", "apps\NotificationHub.MessagingFunctions\NotificationHub.MessagingFunctions.csproj", "{1A4B801A-E1F8-40EF-ADC9-7F7A7A6853D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

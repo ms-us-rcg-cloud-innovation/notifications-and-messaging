@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:NotificationHub.Maui.ViewModels;assembly=NotificationHub.Maui"
              x:Class="NotificationHub.Maui.MainPage">
 
     <ScrollView>
@@ -8,39 +9,63 @@
             Spacing="25"
             Padding="30,0"
             VerticalOptions="Center">
-
-            <Image
-                Source="dotnet_bot.png"
-                SemanticProperties.Description="Cute dot net bot waving hi to you!"
-                HeightRequest="200"
-                HorizontalOptions="Center" />
-
             <Label
                 Text="Hello, World!"
                 SemanticProperties.HeadingLevel="Level1"
                 FontSize="32"
                 HorizontalOptions="Center" />
-
-            <Label
-                Text="Welcome to .NET Multi-platform App UI"
-                SemanticProperties.HeadingLevel="Level2"
-                SemanticProperties.Description="Welcome to dot net Multi platform App U I"
-                FontSize="18"
+            <Border Stroke="LightGray"
+                    StrokeThickness="2"
+                    Padding="8,1,1,4"
+                    StrokeShape="RoundRectangle 5,5,5,5"
+                    >
+                <Entry 
+                Placeholder="Change User"
+                PlaceholderColor="BlueViolet"
+                Text="{Binding UserId}"
+                />
+            </Border>
+            <Border Stroke="LightGray"
+                    StrokeThickness="2"
+                    Padding="8,1,1,4"
+                    StrokeShape="RoundRectangle 5,5,5,5"
+                    >
+                <Entry 
+                Placeholder="Tags (comma delimited)"
+                PlaceholderColor="BlueViolet"
+                Text="{Binding Tags}"/>
+            </Border>
+            <Button                
+                x:Name="AddTagsBtn"
+                Text="Register User"
+                SemanticProperties.Hint="Commits changes to Notification Hub"
+                Command="{Binding RegisterUserCommand}"
                 HorizontalOptions="Center" />
+
+            <!--<Label
+                Text="{Binding CurrentUser, StringFormat='User: {0}'}"
+                FontSize="16"
+                HorizontalTextAlignment="Start"
+                FontAttributes="Italic" />
+            <Label
+                Text="{Binding TagList, StringFormat='Tags: {0}'}"
+                HorizontalTextAlignment="Start"
+                FontSize="16"
+                FontAttributes="Italic" />-->
             <Label
                 x:Name="NotificationLbl"
-                Text="{Binding NotificationMessage}"
+                HorizontalTextAlignment="Start"
+                Text="Notification:"                
                 SemanticProperties.HeadingLevel="Level2"
-                SemanticProperties.Description="Welcome to dot net Multi platform App U I"
-                FontSize="18"
+                FontSize="16"
                 HorizontalOptions="Center" />
-            <Button
-                x:Name="CounterBtn"
-                Text="Click me"
-                SemanticProperties.Hint="Counts the number of times you click"
-                Clicked="OnCounterClicked"
+            <Label
+                x:Name="NotificationContentLbl"
+                HorizontalTextAlignment="Start"
+                Text="{Binding NotificationMessage, StringFormat='{0}'}"                
+                SemanticProperties.HeadingLevel="Level2"
+                FontSize="14"
                 HorizontalOptions="Center" />
-
 
         </VerticalStackLayout>
     </ScrollView>

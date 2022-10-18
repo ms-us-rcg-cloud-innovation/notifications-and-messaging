@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.Logging;
 using NotificationHub.Maui.Services;
 using System;
 using System.Collections.Generic;
@@ -12,15 +13,38 @@ namespace NotificationHub.Maui.ViewModels
     public partial class MainPageViewModel
         : ObservableObject
     {
-        private readonly INotificationHandler _notificationHandler;
+        private readonly ILogger<MainPageViewModel> _logger;
+        private readonly DeviceRegistrationService _deviceRegistrationService;
+        private readonly IDeviceInstallationService _deviceInstallationService;
+
+        public MainPageViewModel(ILogger<MainPageViewModel> logger, IDeviceInstallationService deviceInstallationService, DeviceRegistrationService deviceRegistrationService)
+        {
+            _logger = logger;
+            _deviceRegistrationService = deviceRegistrationService;
+            _deviceInstallationService = deviceInstallationService;
+
+            Init();
+        }
+
+        partial void Init();
 
         [ObservableProperty]
-        private string notificationMessage = "Notification message";
+        private string _notificationMessage;
 
-        public MainPageViewModel(INotificationHandler notificationHandler)
-        {
-            _notificationHandler = notificationHandler;
-            _notificationHandler.NotificationReceived += (s, e) => { NotificationMessage = e.Message.Body; };
-        }
+
+        [ObservableProperty]
+        private string _userId;
+
+        [ObservableProperty]
+        private string _installationId;
+
+        [ObservableProperty]
+        private string _tags;
+
+        [ObservableProperty]
+        private string _tagList;
+
+        [ObservableProperty]
+        private string _currentUser;
     }
 }

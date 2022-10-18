@@ -18,6 +18,7 @@ namespace NotificationHub.Maui.Services
         public async Task<string> UpsertDeviceInstallationAsync(DeviceInstallation deviceInstallation)
         {            
             using var request = new HttpRequestMessage(HttpMethod.Post, "/");
+            
             request.Content = new StringContent(JsonSerializer.Serialize(deviceInstallation));
             using var response = await _client.SendAsync(request);
 

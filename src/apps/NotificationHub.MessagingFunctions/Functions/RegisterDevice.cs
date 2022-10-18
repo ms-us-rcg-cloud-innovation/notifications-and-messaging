@@ -10,10 +10,17 @@ namespace NotificationHub.MessagingFunctions.Functions
 {
     public class RegisterDevice
     {
+        private static readonly Dictionary<string, NotificationPlatform> _platformEnumLookup = new()
+        {
+            {"fcm", NotificationPlatform.Fcm },
+            {"gcm", NotificationPlatform.Fcm },
+            {"apns", NotificationPlatform.Apns }
+        };
+
         private readonly ILogger _logger;
         private readonly NotificationHubService _hubService;
 
-        public record DeviceDetails(string Id, string Channel, NotificationPlatform Platform, IList<string> Tags);
+        public record DeviceDetails(string InstallationId, string PushChannel, string Platform, IList<string> Tags);
 
         public RegisterDevice(ILogger<RegisterDevice> logger, NotificationHubService hubService)
         {
@@ -34,17 +41,27 @@ namespace NotificationHub.MessagingFunctions.Functions
             try
             {
                 var deviceDetails = await request.ReadFromJsonAsync<DeviceDetails>();
+                bool validPlatform = _platformEnumLookup.TryGetValue(deviceDetails.Platform.ToLower(), out var platform);
 
-                if (deviceDetails is null)
+                if (deviceDetails is null || !validPlatform)
                 {
-                    return await request.CreateErrorResponseAsync("Invalid device details provided");
+
+                    var message = "Invalid device details." + (!validPlatform ? $" {deviceDetails.Platform} is not a valid Platform" : "");
+                    _logger.LogError(message);
+                    return await request.CreateErrorResponseAsync(message);
                 }
 
-                await _hubService.UpsertDeviceRegistrationAsync(deviceDetails.Id
-                                                              , deviceDetails.Channel
-                                                              , deviceDetails.Platform
-                                                              , cancellationToken
-                                                              , tags: deviceDetails.Tags);
+               
+
+                if(validPlatform)
+                {
+                    await _hubService.UpsertDeviceRegistrationAsync(
+                                                deviceDetails.InstallationId
+                                              , deviceDetails.PushChannel
+                                              , platform
+                                              , cancellationToken
+                                              , tags: deviceDetails.Tags);
+                }
 
                 return await request.CreateOkResponseAsync(deviceDetails);
             }

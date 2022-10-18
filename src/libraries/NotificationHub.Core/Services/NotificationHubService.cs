@@ -82,7 +82,7 @@ public class NotificationHubService
 
                 break;
             default:
-                throw new Exception("Invalid Platform");
+                throw new Exception("Unsupported Platform");
         }
 
         return outcome;

@@ -42,7 +42,7 @@
                 Command="{Binding RegisterUserCommand}"
                 HorizontalOptions="Center" />
 
-            <Label
+            <!--<Label
                 Text="{Binding CurrentUser, StringFormat='User: {0}'}"
                 FontSize="16"
                 HorizontalTextAlignment="Start"
@@ -51,13 +51,20 @@
                 Text="{Binding TagList, StringFormat='Tags: {0}'}"
                 HorizontalTextAlignment="Start"
                 FontSize="16"
-                FontAttributes="Italic" />
+                FontAttributes="Italic" />-->
             <Label
                 x:Name="NotificationLbl"
                 HorizontalTextAlignment="Start"
+                Text="Notification:"                
+                SemanticProperties.HeadingLevel="Level2"
+                FontSize="16"
+                HorizontalOptions="Center" />
+            <Label
+                x:Name="NotificationContentLbl"
+                HorizontalTextAlignment="Start"
                 Text="{Binding NotificationMessage, StringFormat='{0}'}"                
                 SemanticProperties.HeadingLevel="Level2"
-                FontSize="18"
+                FontSize="14"
                 HorizontalOptions="Center" />
 
         </VerticalStackLayout>

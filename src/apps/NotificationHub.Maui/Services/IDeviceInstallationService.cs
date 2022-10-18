@@ -9,9 +9,13 @@ namespace NotificationHub.Maui.Services
 {
     public interface IDeviceInstallationService
     {
-        string Token { get; set; }
-        bool IsNotificationsSupported(out string error);
+        Task<string> GetTokenAsync();
+        Task SetTokenAsync(string token);
+
         string GetDeviceId();
-        DeviceInstallation GetDeviceInstallation(params string[] tags);
+
+        bool AreNotificationSupported(out string error);
+
+        Task<DeviceInstallation> GenerateDeviceInstallationAsync(params string[] tags);
     }
 }

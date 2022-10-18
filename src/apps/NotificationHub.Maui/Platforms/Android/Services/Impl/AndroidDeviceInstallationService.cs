@@ -1,22 +1,38 @@
 ﻿using Android.Gms.Common;
 using NotificationHub.Maui.Models;
 using NotificationHub.Maui.Services;
-using Android.Provider;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using static Android.Provider.Settings;
 
-namespace NotificationHub.Maui.Platforms.Android.Services
+namespace NotificationHub.Maui.Platforms.Android.Services.Impl
 {
-    internal class AndroidDeviceInstallationService
+    public class AndroidDeviceInstallationService
         : IDeviceInstallationService
     {
-        public string Token { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        private const string FIREBASE_TOKEN_KEY = "fcm-token";
 
-        public bool IsNotificationsSupported(out string error)
+
+        public async Task<string> GetTokenAsync()
+            => await SecureStorage.GetAsync(FIREBASE_TOKEN_KEY);
+
+        public async Task SetTokenAsync(string token)
+            => await SecureStorage.SetAsync(FIREBASE_TOKEN_KEY, token);
+
+        public async Task<DeviceInstallation> GenerateDeviceInstallationAsync(params string[] tags)
+            => new DeviceInstallation
+                {
+                    InstallationId = GetDeviceId(),
+                    Platform = "fcm",
+                    PushChannel = await GetTokenAsync(),
+                    Tags = tags?.ToList()
+                };
+
+        public bool AreNotificationSupported(out string error)
         {
             error = null;
             int resultCode = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(MainApplication.Context);
@@ -32,7 +48,6 @@ namespace NotificationHub.Maui.Platforms.Android.Services
             return isSuccess;
         }
 
-
         public string GetDeviceId()
         {
             var context = MainApplication.Context;
@@ -42,26 +57,5 @@ namespace NotificationHub.Maui.Platforms.Android.Services
             return id;
         }
 
-        public DeviceInstallation GetDeviceInstallation(params string[] tags)
-        {
-            if (!IsNotificationsSupported(out string error))
-            {
-                throw new Exception(error);
-            }
-
-            if(string.IsNullOrEmpty(Token))
-            {
-                throw new Exception("No available token for FCM");
-            }
-
-            var installation = new DeviceInstallation
-            {
-                InstallationId = GetDeviceId(),
-                Platform = "fcm",
-                PushChannel = Token
-            };
-
-            return installation;
-        }
     }
 }

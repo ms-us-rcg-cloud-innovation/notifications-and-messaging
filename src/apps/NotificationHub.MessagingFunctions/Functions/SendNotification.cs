@@ -31,7 +31,8 @@ namespace NotificationHub.MessagingFunctions.Functions
             [HttpTrigger(
                 AuthorizationLevel.Function
               , "post"
-              , Route = "send-notification")] HttpRequestData request)
+              , Route = "send-notification")] HttpRequestData request
+              , CancellationToken cancellationToken)
         {
             _logger.LogInformation("Sending notification to targeted audiance");
 
@@ -46,8 +47,9 @@ namespace NotificationHub.MessagingFunctions.Functions
 
                 var notificationPayload = CreateRawPayload(notification);
                 var outcome = await _hubService.SendNotificationAsync(notification.Platform
-                                                                    , notificationPayload
-                                                                    , notification.Tags);
+                                                                    , notificationPayload                                                                    
+                                                                    , cancellationToken
+                                                                    , tags: notification.Tags);
 
                 _logger.LogInformation("Message sent to Notification Hub");
 

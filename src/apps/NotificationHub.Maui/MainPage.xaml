@@ -37,7 +37,7 @@
             </Border>
             <Button                
                 x:Name="AddTagsBtn"
-                Text="Update Tags"
+                Text="Register User"
                 SemanticProperties.Hint="Commits changes to Notification Hub"
                 Command="{Binding RegisterUserCommand}"
                 HorizontalOptions="Center" />
@@ -56,7 +56,6 @@
                 x:Name="NotificationLbl"
                 HorizontalTextAlignment="Start"
                 Text="{Binding NotificationMessage, StringFormat='{0}'}"                
-                TextColor="fF"
                 SemanticProperties.HeadingLevel="Level2"
                 FontSize="18"
                 HorizontalOptions="Center" />

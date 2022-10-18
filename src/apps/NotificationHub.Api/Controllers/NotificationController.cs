@@ -19,11 +19,11 @@ namespace NotificationHub.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PushNotificationAsync(PushNotification notification)
+        public async Task<IActionResult> PushNotificationAsync(PushNotification notification, CancellationToken cancellationToken)
         {
             try
             {
-                var outcome = await _notificationService.SendNotificationAsync(notification.Platform, CreateRawPayload(notification));
+                var outcome = await _notificationService.SendNotificationAsync(notification.Platform, CreateRawPayload(notification), cancellationToken);
                 return Ok(outcome);
             }
             catch(Exception e)

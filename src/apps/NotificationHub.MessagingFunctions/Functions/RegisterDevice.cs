@@ -8,25 +8,26 @@ using NotificationHub.Core.Services;
 
 namespace NotificationHub.MessagingFunctions.Functions
 {
-    public class Register
+    public class RegisterDevice
     {
         private readonly ILogger _logger;
         private readonly NotificationHubService _hubService;
 
         public record DeviceDetails(string Id, string Channel, NotificationPlatform Platform, IList<string> Tags);
 
-        public Register(ILogger<Register> logger, NotificationHubService hubService)
+        public RegisterDevice(ILogger<RegisterDevice> logger, NotificationHubService hubService)
         {
             _logger = logger;
             _hubService = hubService;
         }
 
-        [Function(nameof(Register))]
+        [Function(nameof(RegisterDevice))]
         public async Task<HttpResponseData> RunAsync(
             [HttpTrigger(
                 AuthorizationLevel.Function
               , "post"
-              , Route = "register-device")] HttpRequestData request)
+              , Route = "register-device")] HttpRequestData request
+              , CancellationToken cancellationToken)
         {
             _logger.LogInformation("Registering device with Notification Hub");
 
@@ -42,7 +43,8 @@ namespace NotificationHub.MessagingFunctions.Functions
                 await _hubService.UpsertDeviceRegistrationAsync(deviceDetails.Id
                                                               , deviceDetails.Channel
                                                               , deviceDetails.Platform
-                                                              , deviceDetails.Tags);
+                                                              , cancellationToken
+                                                              , tags: deviceDetails.Tags);
 
                 return await request.CreateOkResponseAsync(deviceDetails);
             }

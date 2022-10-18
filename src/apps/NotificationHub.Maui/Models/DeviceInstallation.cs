@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace NotificationHub.Maui.Models
 {
-    internal class DeviceInstallation
+    public class DeviceInstallation
     {
+        public string InstallationId { get; set; }
+        public string Platform { get; set; }
+        public string PushChannel { get; set; }
+        public List<string> Tags { get; set; } = new List<string>();
     }
 }

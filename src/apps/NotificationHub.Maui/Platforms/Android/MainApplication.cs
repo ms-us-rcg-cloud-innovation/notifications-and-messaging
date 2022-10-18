@@ -1,17 +1,8 @@
 ﻿using Android.App;
-using Android.Content;
-using Android.Media;
-using Android.OS;
 using Android.Runtime;
-using AndroidX.Core.App;
-using Firebase;
-using NotificationHub.Core.Maui.Platforms.Android.Services.Impl;
-using NotificationHub.Maui.Models;
-using NotificationHub.Maui.Platforms.Android.Helpers;
+using NotificationHub.Maui.Platforms.Android.Services;
 using NotificationHub.Maui.Services;
-//using Plugin.FirebasePushNotification;
-using System.Security.Cryptography;
-using WindowsAzure.Messaging.NotificationHubs;
+using Plugin.FirebasePushNotification;
 using AzNH = WindowsAzure.Messaging.NotificationHubs;
 
 
@@ -28,11 +19,20 @@ public class MainApplication : MauiApplication
 
     protected override MauiApp CreateMauiApp()
     {
-        // local constants is a git ignored file
-        // create a class with those constants corresponding to your hub details
-        AzNH.NotificationHub.Start(this, Local_Constants.HUB_NAME, Local_Constants.HUB_CONNECTIONSTRING);
+        //If debug you should reset the token each time.
+#if DEBUG
+        FirebasePushNotificationManager.Initialize(this, true);
+#else
+        FirebasePushNotificationManager.Initialize(this,false);
+#endif
+        // initialize after refreshing refresh token
+        AzNH.NotificationHub.Start(MainApplication.Current, Local_Constants.HUB_NAME, Local_Constants.HUB_CONNECTIONSTRING);
 
-        return MauiProgram.CreateMauiApp();
+        var appBuilder = MauiApp.CreateBuilder();
+        appBuilder.Services.AddScoped<IDeviceInstallationService, AndroidDeviceInstallationService>();
+
+
+        return MauiProgram.CreateMauiApp(appBuilder);
     }
 
 }

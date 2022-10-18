@@ -1,18 +1,12 @@
-﻿using Android.Hardware.Usb;
-using Android.Nfc;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Javax.Xml.Transform;
 using NotificationHub.Core.Maui.Platforms.Android.Services.Impl;
+using NotificationHub.Maui.Models;
+using NotificationHub.Maui.Platforms.Android;
 using Plugin.FirebasePushNotification;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using WindowsAzure.Messaging.NotificationHubs;
+using static Android.Provider.Settings;
 using AzNH = WindowsAzure.Messaging.NotificationHubs;
 
 namespace NotificationHub.Maui.ViewModels
@@ -20,12 +14,30 @@ namespace NotificationHub.Maui.ViewModels
     public partial class MainPageViewModel
         : ObservableObject
     {
+        private record DeviceDetails(string Id, string Channel, string Platform, IList<string> Tags);
+
         private const string DEFAULT_INSTALLATION_TEMPLATE = "default";
         private InstallationTemplate _installationTemplate;
 
         partial void Init()
         {
-            RegisterUsersCommand = new RelayCommand(RegisterUser);
+            FirebasePushNotificationManager.Initialize(MainApplication.Context, true);
+
+            CrossFirebasePushNotification.Current.OnTokenRefresh += (sender, args) =>
+            {
+                // update registration through API
+                var deviceId = GetDeviceId();
+                Secure.Set
+                var installation = new DeviceInstallation
+                {
+                    InstallationId = GetDeviceId(),
+                    Platform = "fcm",
+                    PushChannel = args.Token
+                };
+            };
+
+
+            RegisterUserCommand = new RelayCommand(RegisterUser);
 
             _notificationHandler = new DefaultAndroidNotificationHandler();
             _notificationHandler.NotificationReceived += (s, e) => { NotificationMessage = e.Message.Body; };
@@ -46,33 +58,26 @@ namespace NotificationHub.Maui.ViewModels
         [ObservableProperty]
         private string _currentUser;
 
-        public ICommand RegisterUsersCommand { get; private set; }
+        public ICommand RegisterUserCommand { get; private set; }
 
         private void RegisterUser()
         {
             CurrentUser = UserId;
-            InstallationId = CurrentUser;
+            TagList = Tags;
+            // local constants is a git ignored file
+            // create a class with those constants corresponding to your hub details
             
-            
-        }
-
-        private void Instance_InstanceInstallationSaved(object sender, InstallationAdapterEventArgs e, string[] tags)
-        {
-
-            AzNH.NotificationHub.RemoveTags(AzNH.NotificationHub.Tags.ToEnumerable<string>().ToList());
-            AzNH.NotificationHub.AddTags(tags);
-            TagList = string.Join("; ", _installationTemplate.Tags.ToEnumerable<string>());
-
-            var sysTags = AzNH.NotificationHub.Tags.ToEnumerable<string>();
-        }
-
-        private void UpdateTags()
-        {
             var tags = Tags?.Split("; ") ?? new string[] { "" };
-            _installationTemplate.AddTags(tags);
             AzNH.NotificationHub.AddTags(tags);
-            AzNH.NotificationHub.BeginInstallationUpdate();
+        }
 
+        private string GetDeviceId()
+        {
+            var context = MainApplication.Context;
+
+            var id = Secure.GetString(context.ContentResolver, Secure.AndroidId);
+
+            return id;
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NotificationHub.Core.Builders.Interfaces;
-using NotificationHub.Core.Models;
 using NotificationHub.Core.Services;
 
 namespace NotificationHub.Api.Controllers
@@ -9,6 +8,8 @@ namespace NotificationHub.Api.Controllers
     [ApiController]
     public class NotificationController : ControllerBase
     {
+        public record PushNotification(string Title, string Body, string Platform, string[] Tags);
+
         private readonly NotificationHubService _notificationService;
         private readonly INotificationPayloadBuilder _notificationPayloadBuilder;
 

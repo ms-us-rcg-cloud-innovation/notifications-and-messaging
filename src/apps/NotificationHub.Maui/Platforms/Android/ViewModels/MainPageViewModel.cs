@@ -20,8 +20,11 @@ namespace NotificationHub.Maui.ViewModels
 
         partial void Init()
         {
-
+#if DEBUG
             FirebasePushNotificationManager.Initialize(MainApplication.Context, true);
+#else
+            FirebasePushNotificationManager.Initialize(MainApplication.Context, false);
+#endif
             RegisterFcmTokenRefreshHandler();
             RegisterNotificationReceivedHandler();
 

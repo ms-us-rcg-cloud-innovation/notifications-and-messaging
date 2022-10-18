@@ -96,4 +96,6 @@
 	  <PackageReference Include="Plugin.FirebasePushNotification" Version="3.4.35" />
 	</ItemGroup>
 
+	<ProjectExtensions><VisualStudio><UserProperties XamarinHotReloadDebuggerTimeoutExceptionNotificationHubMauiHideInfoBar="True" /></VisualStudio></ProjectExtensions>
+
 </Project>

@@ -20,13 +20,14 @@ namespace NotificationHub.Maui.ViewModels
 
         partial void Init()
         {
+            RegisterFcmTokenRefreshHandler();
+            RegisterNotificationReceivedHandler();
 #if DEBUG
             FirebasePushNotificationManager.Initialize(MainApplication.Context, true);
 #else
             FirebasePushNotificationManager.Initialize(MainApplication.Context, false);
 #endif
-            RegisterFcmTokenRefreshHandler();
-            RegisterNotificationReceivedHandler();
+
 
             RegisterUserCommand = new AsyncRelayCommand(RegisterUserAsync);
         }
@@ -36,15 +37,14 @@ namespace NotificationHub.Maui.ViewModels
 
         private async Task RegisterUserAsync()
         {
-            CurrentUser = UserId;
-            TagList = Tags;
-
             var outcome = await RegisterDeviceInstallationAsync();
         }
 
         private async Task<string> RegisterDeviceInstallationAsync()
         {
-            var installation = await _deviceInstallationService.GenerateDeviceInstallationAsync(Tags);
+            var tagList = Tags?.Split(",") ?? new string[0];
+
+            var installation = await _deviceInstallationService.GenerateDeviceInstallationAsync(tagList);
             var outcome = await _deviceRegistrationService.UpsertDeviceInstallationAsync(installation);
 
             return outcome;

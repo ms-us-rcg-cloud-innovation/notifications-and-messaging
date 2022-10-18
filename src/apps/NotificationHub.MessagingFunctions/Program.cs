@@ -1,12 +1,11 @@
-using Microsoft.Extensions.Hosting;
-using NotificationHub.Core.Builders.Interfaces;
-using NotificationHub.Core.Builders;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Azure.NotificationHubs;
-using NotificationHub.Core.Services;
 using Azure.Communication.Sms;
-using Microsoft.Extensions.Azure;
+using Microsoft.Azure.NotificationHubs;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using NotificationHub.Core.Builders;
+using NotificationHub.Core.Builders.Interfaces;
+using NotificationHub.Core.Services;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()

@@ -31,20 +31,7 @@ namespace NotificationHub.Maui.ViewModels
         [ObservableProperty]
         private string _notificationMessage;
 
-
-        [ObservableProperty]
-        private string _userId;
-
-        [ObservableProperty]
-        private string _installationId;
-
         [ObservableProperty]
         private string _tags;
-
-        [ObservableProperty]
-        private string _tagList;
-
-        [ObservableProperty]
-        private string _currentUser;
     }
 }

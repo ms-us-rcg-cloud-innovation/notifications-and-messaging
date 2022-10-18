@@ -1,15 +1,16 @@
-using System.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using NotificationHub.Core.FunctionHelpers;
 using NotificationHub.Core.Services;
-using static NotificationHub.MessagingFunctions.Functions.RegisterDevice;
+using System.Net;
 
 namespace NotificationHub.MessagingFunctions.Functions
 {
     public class DeleteDeviceRegistration
     {
+        public record Installation(string Id);
+
         private readonly ILogger _logger;
         private readonly NotificationHubService _hubService;
 
@@ -24,22 +25,23 @@ namespace NotificationHub.MessagingFunctions.Functions
                 [HttpTrigger(
                         AuthorizationLevel.Function
                       , "post"
-                      , Route = "delete-registration/{id}")] HttpRequestData request
-                      , CancellationToken cancellationToken
-                      , string id)
+                      , Route = "delete-registration")] HttpRequestData request
+                      , CancellationToken cancellationToken)
         {
             _logger.LogInformation("Registering device with Notification Hub");
 
             try
             {
-                if (string.IsNullOrEmpty(id))
+                var installation = await request.ReadFromJsonAsync<Installation>();
+
+                if (string.IsNullOrEmpty(installation.Id))
                 {
                     return await request.CreateErrorResponseAsync("Registration Id is required");
                 }
 
-                await _hubService.DeleteDeviceInstallation(id, cancellationToken);
+                await _hubService.DeleteDeviceInstallation(installation.Id, cancellationToken);
 
-                return await request.CreateOkResponseAsync(id);
+                return await request.CreateOkResponseAsync(installation.Id);
             }
             catch (Exception e)
             {

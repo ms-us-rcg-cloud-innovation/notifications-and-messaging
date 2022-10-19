@@ -42,7 +42,7 @@ namespace NotificationHub.Maui.ViewModels
 
         private async Task<string> RegisterDeviceInstallationAsync()
         {
-            var tagList = Tags?.Split(",").Select(x => x.Trim()).ToArray() ?? new string[0];
+            var tagList = Tags?.Split(",").Select(x => x.Trim()).ToArray() ?? Array.Empty<string>();
 
             var installation = await _deviceInstallationService.GenerateDeviceInstallationAsync(tagList);
             var outcome = await _deviceRegistrationService.UpsertDeviceInstallationAsync(installation);

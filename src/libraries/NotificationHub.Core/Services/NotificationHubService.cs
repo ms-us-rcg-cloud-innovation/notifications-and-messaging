@@ -13,17 +13,41 @@ public class NotificationHubService
         _client = client;
     }
 
-    public async Task<NotificationOutcome> SendNotificationAsync(string platform, string payload, CancellationToken cancellationToken, IList<string> tags = null)
+    public async Task<IList<NotificationOutcome>> SendNotificationAsync(NotificationPlatform platform, string payload, IList<string> tags, string tagExpressions, CancellationToken cancellationToken)
     {
+        bool hasTags = tags?.Count > 0 == true;
+        bool hasExpression = string.IsNullOrEmpty(tagExpressions);
+        bool broadcastToAll = !hasTags && !hasExpression;
+
+        List<NotificationOutcome> outcome = new();
         switch(platform)
         {
-            case "fcm":
-                return tags?.Count > 0 ? await _client.SendFcmNativeNotificationAsync(payload, tags, cancellationToken) : await _client.SendFcmNativeNotificationAsync(payload, cancellationToken);
-            case "aps":
-                return tags?.Count > 0 ? await _client.SendAppleNativeNotificationAsync(payload, tags, cancellationToken) : await _client.SendAppleNativeNotificationAsync(payload, cancellationToken);
+            case NotificationPlatform.Fcm:
+                // default action is to send to all
+                if (broadcastToAll)
+                {
+                    outcome.Add(await _client.SendFcmNativeNotificationAsync(payload, cancellationToken));
+                }
+                else
+                {
+                    // you can send notifcation using both
+                    // tags and tag expression in one request
+                    // they are not mutually exclusive
+                    if (hasTags)
+                    {// use tags for targeting
+                        outcome.Add(await _client.SendFcmNativeNotificationAsync(payload, tags, cancellationToken));
+                    }
+                    if (hasExpression)
+                    {// use exprssion for targeting
+                        outcome.Add(await _client.SendFcmNativeNotificationAsync(payload, tagExpressions, cancellationToken));
+                    }
+                }
+                break;
             default:
-                throw new Exception("Invalid Platform");
+                throw new Exception($"Unsupported platform {platform}");
         }
+
+        return outcome;
     }
 
     public async Task UpsertDeviceRegistrationAsync(string id, string channel, NotificationPlatform platform, CancellationToken cancellationToken, IList<string> tags = null)

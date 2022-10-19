@@ -12,8 +12,7 @@ namespace NotificationHub.MessagingFunctions
         public static readonly Dictionary<string, NotificationPlatform> PlatformEnumLookup = new()
         {
             { "fcm", NotificationPlatform.Fcm },
-            { "gcm", NotificationPlatform.Fcm },
-            { "apns", NotificationPlatform.Apns }
+            { "gcm", NotificationPlatform.Fcm }
         };
     }
 }

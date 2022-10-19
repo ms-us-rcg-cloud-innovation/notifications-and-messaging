@@ -56,8 +56,9 @@ namespace NotificationHub.MessagingFunctions.Functions
                 var notificationPayload = CreateRawPayload(notification);
                 var outcome = await _hubService.SendNotificationAsync(platform
                                                                     , notificationPayload
-                                                                    , cancellationToken
-                                                                    , tags: notification.Tags);
+                                                                    , notification.Tags
+                                                                    , notification.TagExpression
+                                                                    , cancellationToken);
 
                 _logger.LogInformation("Message sent to Notification Hub");
 

@@ -6,26 +6,11 @@ namespace NotificationHub.Core.Services;
 
 public class NotificationHubService
 {
-
-
     private readonly INotificationHubClient _client;
 
     public NotificationHubService(INotificationHubClient client)
     {
         _client = client;
-    }
-
-    public async Task<NotificationOutcome> SendNotificationViaTagsAsync(NotificationPlatform platform, string payload, IList<string> tags, CancellationToken cancellationToken)
-    {
-        switch (platform)
-        {
-            case NotificationPlatform.Fcm:
-                return await _client.SendFcmNativeNotificationAsync(payload, cancellationToken);
-            case NotificationPlatform.Apns:
-                return await _client.SendAppleNativeNotificationAsync(payload, cancellationToken);
-            default:
-                throw new Exception("Invalid Platform");
-        }
     }
 
     public async Task<IList<NotificationOutcome>> SendNotificationAsync(NotificationPlatform platform, string payload, IList<string> tags, string tagExpressions, CancellationToken cancellationToken)
@@ -34,8 +19,9 @@ public class NotificationHubService
         bool hasExpression = string.IsNullOrEmpty(tagExpressions);
         bool broadcastToAll = !hasTags && !hasExpression;
 
-        var outcome = new List<NotificationOutcome>();
-        switch (platform)
+
+        List<NotificationOutcome> outcome = new();
+        switch(platform)
         {
             case NotificationPlatform.Fcm:
                 // default action is to send to all
@@ -57,32 +43,9 @@ public class NotificationHubService
                         outcome.Add(await _client.SendFcmNativeNotificationAsync(payload, tagExpressions, cancellationToken));
                     }
                 }
-                          
-                break;
-            case NotificationPlatform.Apns:
-                // default action is to send to all
-                if (broadcastToAll)
-                {
-                    outcome.Add(await _client.SendAppleNativeNotificationAsync(payload, cancellationToken));
-                }
-                else
-                {
-                    // you can send notifcation using both
-                    // tags and tag expression in one request
-                    // they are not mutually exclusive
-                    if (hasTags)
-                    {// use tags for targeting
-                        outcome.Add(await _client.SendAppleNativeNotificationAsync(payload, tags, cancellationToken));
-                    }
-                    if (hasExpression)
-                    {// use exprssion for targeting
-                        outcome.Add(await _client.SendAppleNativeNotificationAsync(payload, tagExpressions, cancellationToken));
-                    }
-                }
-
                 break;
             default:
-                throw new Exception("Unsupported Platform");
+                throw new Exception($"Unsupported platform {platform}");
         }
 
         return outcome;

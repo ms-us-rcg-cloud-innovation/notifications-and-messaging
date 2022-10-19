@@ -44,8 +44,6 @@ namespace NotificationHub.MessagingFunctions.Functions
                     return await request.CreateErrorResponseAsync(message);
                 }
 
-
-
                 if (validPlatform)
                 {
                     await _hubService.UpsertDeviceRegistrationAsync(

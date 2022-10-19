@@ -19,7 +19,6 @@ public class NotificationHubService
         bool hasExpression = string.IsNullOrEmpty(tagExpressions);
         bool broadcastToAll = !hasTags && !hasExpression;
 
-
         List<NotificationOutcome> outcome = new();
         switch(platform)
         {

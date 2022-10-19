@@ -53,7 +53,7 @@ namespace NotificationHub.MessagingFunctions.Functions
                     return await request.CreateErrorResponseAsync(message);
                 }
 
-                var notificationPayload = CreateRawPayload(notification);
+                var notificationPayload = CreateRawPayload(platform, notification.Title, notification.Body);
                 var outcome = await _hubService.SendNotificationAsync(platform
                                                                     , notificationPayload
                                                                     , notification.Tags
@@ -73,20 +73,17 @@ namespace NotificationHub.MessagingFunctions.Functions
         }
 
 
-        private string CreateRawPayload(NotificationRequest notification)
+        private string CreateRawPayload(NotificationPlatform platform, string title, string body)
         {
             _payloadBuilder
-                .AddTitle(notification.Title)
-                .AddBody(notification.Body);
+                .AddTitle(title)
+                .AddBody(body);
 
-            switch (notification.Platform)
+            switch (platform)
             {
-                case "fcm":
-                    return _payloadBuilder.BuildAndroidPayload();
-                case "aps":
-                    return _payloadBuilder.BuildApplePayload();
+                case NotificationPlatform.Fcm:
                 default:
-                    throw new Exception("Invalid platform");
+                    return _payloadBuilder.BuildAndroidPayload();
             }
         }
     }

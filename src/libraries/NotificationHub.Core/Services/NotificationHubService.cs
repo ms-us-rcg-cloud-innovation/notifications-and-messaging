@@ -16,7 +16,7 @@ public class NotificationHubService
     public async Task<IList<NotificationOutcome>> SendNotificationAsync(NotificationPlatform platform, string payload, IList<string> tags, string tagExpressions, CancellationToken cancellationToken)
     {
         bool hasTags = tags?.Count > 0 == true;
-        bool hasExpression = string.IsNullOrEmpty(tagExpressions);
+        bool hasExpression = !string.IsNullOrEmpty(tagExpressions);
         bool broadcastToAll = !hasTags && !hasExpression;
 
         List<NotificationOutcome> outcome = new();

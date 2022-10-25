@@ -1,4 +1,5 @@
 using Azure.Communication.Sms;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.NotificationHubs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,13 @@ var host = new HostBuilder()
     {
 
         services.AddScoped<INotificationPayloadBuilder, NotificationPayloadBuilder>();
+        var client = new CosmosClient("", new CosmosClientOptions
+        {
+            SerializerOptions = new CosmosSerializationOptions
+            {
+                PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
+            }
+        });
 
         // add azure notification hub service
         services.AddScoped(sp =>

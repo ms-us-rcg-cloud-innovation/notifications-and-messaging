@@ -6,15 +6,15 @@ namespace NotificationHub.Core.FunctionHelpers
 {
     internal static class HttpRequestDataExtensions
     {
-        public static async Task<HttpResponseData> CreateOkResponseAsync<T>(this HttpRequestData request, T content)
+        public static async Task<HttpResponseData> CreateOkResponseAsync<T>(this HttpRequestData request, T content, CancellationToken cancellationToken = default)
         {
             var response = request.CreateResponse(HttpStatusCode.OK);
-            await response.WriteAsJsonAsync(content);
+            await response.WriteAsJsonAsync(content, cancellationToken);
 
             return response;
         }
 
-        public static async Task<HttpResponseData> CreateErrorResponseAsync(this HttpRequestData request, string message, HttpStatusCode status = HttpStatusCode.BadRequest)
+        public static async Task<HttpResponseData> CreateErrorResponseAsync(this HttpRequestData request, string message, HttpStatusCode status = HttpStatusCode.BadRequest, CancellationToken cancellationToken = default)
         {
             var content = new ErrorResponse()
             {
@@ -23,7 +23,7 @@ namespace NotificationHub.Core.FunctionHelpers
                 Message = message
             };
             var response = request.CreateResponse(HttpStatusCode.InternalServerError);
-            await response.WriteAsJsonAsync(content);
+            await response.WriteAsJsonAsync(content, cancellationToken);
 
             return response;
         }

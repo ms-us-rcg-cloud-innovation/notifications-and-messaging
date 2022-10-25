@@ -42,7 +42,7 @@ namespace NotificationHub.MessagingFunctions.Functions
         {
             _logger.LogInformation("Saving DeviceInformation");
 
-            var device = await request.ReadFromJsonAsync<DeviceDetails>();
+            var device = await request.ReadFromJsonAsync<DeviceDetails>(cancellationToken);
             DeviceInformation deviceInformation = new()
             {
                 Id = Guid.NewGuid().ToString(),
@@ -66,7 +66,7 @@ namespace NotificationHub.MessagingFunctions.Functions
 
             MultiResponse response = new(
                 DeviceInfo: deviceInformation
-              , ResponseData: await request.CreateOkResponseAsync(deviceInformation));
+              , ResponseData: await request.CreateOkResponseAsync(deviceInformation, cancellationToken));
 
             return response;
         }

@@ -7,20 +7,15 @@ using Microsoft.Extensions.Hosting;
 using NotificationHub.Core.Builders;
 using NotificationHub.Core.Builders.Interfaces;
 using NotificationHub.Core.Services;
+using NotificationHub.MessagingFunctions;
 
+CosmosClient cosmosClient = default;
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
     .ConfigureServices((context, services) =>
     {
-
+        cosmosClient = new CosmosClient(context.Configuration.GetConnectionString(ConfigurationConstants.COSMOS_CONNECTIONSTRING_CONFIG_KEY));
         services.AddScoped<INotificationPayloadBuilder, NotificationPayloadBuilder>();
-        var client = new CosmosClient("", new CosmosClientOptions
-        {
-            SerializerOptions = new CosmosSerializationOptions
-            {
-                PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
-            }
-        });
 
         // add azure notification hub service
         services.AddScoped(sp =>

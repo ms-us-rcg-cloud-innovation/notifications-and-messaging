@@ -13,8 +13,8 @@ namespace NotificationHub.MessagingFunctions.Functions
 
         public record MultiResponse(
                             [property:CosmosDBOutput(
-                                databaseName: ConfigurationConstants.COSMOS_DB_CONFIG_KEY
-                              , collectionName: ConfigurationConstants.COSMOS_DEVICES_CONTAINER_CONFIG_KEY
+                                databaseName: $"%{ConfigurationConstants.COSMOS_DB_CONFIG_KEY}%"
+                              , collectionName: $"%{ConfigurationConstants.COSMOS_DEVICES_CONTAINER_CONFIG_KEY}%"
                               , ConnectionStringSetting = ConfigurationConstants.COSMOS_CONNECTIONSTRING_CONFIG_KEY
                               , PartitionKey = ConfigurationConstants.DEVICES_CONTAINER_PARTITIONKEY
                               , CreateIfNotExists = true)]

@@ -25,4 +25,5 @@ variable "notification_hub_name" {
 
 variable "gcm_api_key" {
     type = string
+    default = ""
 }

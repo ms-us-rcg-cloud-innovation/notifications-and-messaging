@@ -33,7 +33,11 @@ resource "azurerm_notification_hub" "notification_hub" {
   namespace_name = azurerm_notification_hub_namespace.namespace.name
   resource_group_name = azurerm_resource_group.resource_group.name
   location = azurerm_resource_group.resource_group.location
-  gcm_credential {
-    api_key = var.gcm_api_key
+
+  dynamic "gcm_credential" {
+    for_each = var.gcm_api_key != "" ? [1] : []
+    content {
+      api_key = var.gcm_api_key
+    }
   }
 }

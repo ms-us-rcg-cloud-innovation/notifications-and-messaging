@@ -7,10 +7,6 @@ terraform {
     }
 }
 
-locals {
-  nh_ns = "nhdemonamespace"
-}
-
 provider "azurerm" {
   features {}
 }

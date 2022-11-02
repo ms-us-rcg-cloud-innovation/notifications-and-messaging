@@ -35,7 +35,7 @@ resource "azurerm_notification_hub" "notification_hub" {
   location = azurerm_resource_group.resource_group.location
 
   dynamic "gcm_credential" {
-    for_each = var.gcm_api_key != "" ? [1] : []
+    for_each = var.gcm_api_key[*]
     content {
       api_key = var.gcm_api_key
     }

@@ -18,10 +18,8 @@ var host = new HostBuilder()
         services.AddScoped(sp =>
         {
             var hubName = context.Configuration.GetValue<string>("NOTIFICATION_HUB_NAME");
-            var connectionString = context.Configuration.GetConnectionString("NOTIFICATION_HUB_CS");
-
+            var connectionString = context.Configuration.GetValue<string>("NOTIFICATION_HUB_CS");
             var client = new NotificationHubClient(connectionString, hubName);
-
             return new NotificationHubService(client);
         });
     })

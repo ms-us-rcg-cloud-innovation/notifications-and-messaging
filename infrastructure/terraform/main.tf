@@ -24,6 +24,7 @@ resource "azurerm_notification_hub_namespace" "nh_namespace" {
   location = azurerm_resource_group.resource_group.location
   namespace_type = "NotificationHub"
   sku_name = "Basic"
+  
 }
 
 resource "azurerm_notification_hub" "notification_hub" {
@@ -31,7 +32,7 @@ resource "azurerm_notification_hub" "notification_hub" {
   namespace_name = azurerm_notification_hub_namespace.nh_namespace.name
   resource_group_name = azurerm_resource_group.resource_group.name
   location = azurerm_resource_group.resource_group.location
-  
+
   dynamic "gcm_credential" {
     for_each = var.gcm_api_key[*]
     content {
@@ -43,10 +44,11 @@ resource "azurerm_notification_hub" "notification_hub" {
 # create a new access policy you can provide to your functions for 
 # registration management
 resource "azurerm_notification_hub_authorization_rule" "nh_shared_listener" {
-  name = "apis-full-access-auth-rule"
+  name = "ManagementApiAccessSignature"
   notification_hub_name = azurerm_notification_hub.notification_hub.name
   namespace_name = azurerm_notification_hub_namespace.nh_namespace.name
   resource_group_name = azurerm_resource_group.resource_group.name
+
   manage = true
   send = true
   listen = true
@@ -86,15 +88,9 @@ resource "azurerm_linux_function_app" "notification_hub_funcs" {
   app_settings = {    
     # set notification hub name as an environment variable for confugration at startup time
     "NOTIFICATION_HUB_NAME" = azurerm_notification_hub.notification_hub.name
+    "NOTIFICATION_HUB_CS" = "Endpoint=sb://${azurerm_notification_hub_namespace.nh_namespace.name}.servicebus.windows.net/;SharedAccessKeyName=${azurerm_notification_hub_authorization_rule.nh_shared_listener.name};SharedAccessKey=${azurerm_notification_hub_authorization_rule.nh_shared_listener.primary_access_key}" #
   }
 
-  # connection string for configuration notificaiton hub client at startup time
-  connection_string {
-    name = "NOTIFICATION_HUB_CS"
-    type = "NotificationHub"
-    value = azurerm_notification_hub_authorization_rule.nh_shared_listener.primary_access_key
-  }  
-  
   site_config {   
        
     minimum_tls_version = "1.2"

@@ -12,59 +12,25 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "resource_group" {
-  name     = "comm-demo-rg"
+  name     = "messaging-demo-rg"
   location = "East US 2"
 }
 
+locals {
+  notification_hub_name = "customer-messaging"
+  notification_hub_namespace = "notification-hub-device-messaging-namespace"
+}
+
 # notification hub
-
-resource "azurerm_notification_hub_namespace" "nh_namespace" {
-  name = "demonnamespace"
-  resource_group_name = azurerm_resource_group.resource_group.name
+module "notification_hub" {
+  source = "./modules/notification-hub"
   location = azurerm_resource_group.resource_group.location
-  namespace_type = "NotificationHub"
-  sku_name = "Basic"
-  
-}
-
-resource "azurerm_notification_hub" "notification_hub" {
-  name = "demonotificationhub"
-  namespace_name = azurerm_notification_hub_namespace.nh_namespace.name
   resource_group_name = azurerm_resource_group.resource_group.name
-  location = azurerm_resource_group.resource_group.location
-
-  dynamic "gcm_credential" {
-    for_each = var.gcm_api_key[*]
-    content {
-      api_key = var.gcm_api_key
-    }
-  }
+  nh_namespace_name = local.notification_hub_namespace
+  nh_name = local.notification_hub_name
 }
 
-# create a new access policy you can provide to your functions for 
-# registration management
-resource "azurerm_notification_hub_authorization_rule" "nh_shared_listener" {
-  name = "ManagementApiAccessSignature"
-  notification_hub_name = azurerm_notification_hub.notification_hub.name
-  namespace_name = azurerm_notification_hub_namespace.nh_namespace.name
-  resource_group_name = azurerm_resource_group.resource_group.name
-
-  manage = true
-  send = true
-  listen = true
-}
-
-# function apps
-resource "azurerm_storage_account" "function_storage_account" {
-  name = "commfuncssa"
-  resource_group_name = azurerm_resource_group.resource_group.name
-  location = azurerm_resource_group.resource_group.location
-  account_tier = "Standard"
-  account_replication_type = "LRS"
-  enable_https_traffic_only = true
-  min_tls_version = "TLS1_2"  
-}
-
+# app service plan host for functions
 resource "azurerm_service_plan" "nh_funcs_service_plan" {
   name = "nh-functions-sp"
   resource_group_name = azurerm_resource_group.resource_group.name
@@ -73,32 +39,16 @@ resource "azurerm_service_plan" "nh_funcs_service_plan" {
   sku_name = "Y1"
 }
 
-resource "azurerm_linux_function_app" "notification_hub_funcs" {
-  name = "notification-hub-functions"
+module "notification_hub_function_app" {
+  source = "./modules/function"
+  function_app_name = "notification-hub-funcs-app"
   resource_group_name = azurerm_resource_group.resource_group.name
   location = azurerm_resource_group.resource_group.location
-
-  storage_account_name = azurerm_storage_account.function_storage_account.name
-  storage_account_access_key = azurerm_storage_account.function_storage_account.primary_access_key
-  service_plan_id = azurerm_service_plan.nh_funcs_service_plan.id  
-  
-  https_only = true
-  functions_extension_version = "~4"
-
-  app_settings = {    
-    # set notification hub name as an environment variable for confugration at startup time
-    "NOTIFICATION_HUB_NAME" = azurerm_notification_hub.notification_hub.name
-    "NOTIFICATION_HUB_CS" = "Endpoint=sb://${azurerm_notification_hub_namespace.nh_namespace.name}.servicebus.windows.net/;SharedAccessKeyName=${azurerm_notification_hub_authorization_rule.nh_shared_listener.name};SharedAccessKey=${azurerm_notification_hub_authorization_rule.nh_shared_listener.primary_access_key}" #
+  storage_account_name = "customermessagingfuncsa" #customer messaging func sa
+  app_service_plan_id = azurerm_service_plan.nh_funcs_service_plan.id
+  func_app_settings = {
+     # set notification hub name as an environment variable for confugration at startup time
+    "NOTIFICATION_HUB_NAME" = local.notification_hub_name
+    "NOTIFICATION_HUB_CS" = "Endpoint=sb://${local.notification_hub_namespace}.servicebus.windows.net/;SharedAccessKeyName=${module.notification_hub.auth_rule_name};SharedAccessKey=${module.notification_hub.auth_rule_primary_access_key}" #
   }
-
-  site_config {   
-       
-    minimum_tls_version = "1.2"
-    http2_enabled = true
-    
-    application_stack {
-      dotnet_version = "6.0"
-      use_dotnet_isolated_runtime = true
-    }
-  }
-} 
+}

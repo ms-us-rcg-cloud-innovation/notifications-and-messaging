@@ -11,16 +11,15 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "resource_group" {
-  name     = "messaging-demo-rg"
-  location = "East US 2"
-}
-
 locals {
   notification_hub_name = "customer-messaging"
   notification_hub_namespace = "notification-hub-device-messaging-namespace"
 }
 
+resource "azurerm_resource_group" "resource_group" {
+  name     = "messaging-demo-rg"
+  location = "East US 2"
+}
 # notification hub
 module "notification_hub" {
   source = "./modules/notification-hub"

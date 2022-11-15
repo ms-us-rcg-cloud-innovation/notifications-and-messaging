@@ -1,3 +1,10 @@
+---
+title: Azure Notifications and Messaging Resources
+description: This asset contains samples, guidance, and selection help for the many azure notification and messaging resources
+author: RCG
+date: 11/15/2022
+---
+
 # About The Project
 
 In this repository you'll find assets demonstrating the different messaging capabilities offered by Azure.  The asset is designed in such a way that it attempts to demonstrate each resources capabilities for a specific use case
@@ -15,7 +22,7 @@ In this project we will deploy:
 - Azure Subscription
 - Firebase project
   - [Getting started with Firebase](https://cloud.google.com/firestore/docs/client/get-firebase)
-- Android Device or Emulator
+- Android Device or Emulator using API 29+
   - [Android Emulator Setup](https://learn.microsoft.com/en-us/xamarin/android/get-started/installation/android-emulator/)
 
 ## Project Components
@@ -54,7 +61,7 @@ Use the decistion tree below to determine the type of implementation you need. D
 
 ## Setup
 
-### Notifications using `Notificatin Hub`
+### Mobile Device Push Notifications with Azure Notificatin Hub
 
 This setup will enable Push Notifications to mobile devices using `Notification Hub` as the broker to Firebase.  The Azur resources used will be `Notification Hub` and `Azure Functions`.  For it all to work you will need to make sure you have a project configured in Firebase (see step 4).
 
@@ -78,14 +85,51 @@ This setup will enable Push Notifications to mobile devices using `Notification 
 4. Configure Maui Firebase integration  
   3.1 [Import `google-services.json`](https://learn.microsoft.com/en-us/azure/notification-hubs/xamarin-notification-hubs-push-notifications-android-gcm#add-the-google-services-json-file) to the `Platforms/Android` folder
 
-> _Note_
->
+#### Send Test Push Notificaitons using Azure Portal
+
+1. Launch the MobileMaui on Android emulator
+2. Navigate to the Notification Hub on Azure Portal
+3. In the Notification Hub navigation pane go to __Support + troubleshooting__ > __Test Send__
+4. Select __Android__ for __Platforms__
+5. Click Send
+6. Observe notification arrival on device
+
+#### Send Test Push Notifications using backend services
+
+1. Launch the MobileMaui on Android emulator
+2. Launch [__Postman__](https://www.postman.com/)
+3. Createa a _POST_ request to the _SendNotification_ function  
+  3.1. Get the function url from Azure Portal
+  
+  > [!IMPORTANT]
+  > Azure Portal > notifications-demo-rg > notification-hub-funcs-app > Functions > SendNotifications > Get Function Url
+
+4. Past Function Url to your __Postman__ request
+5. Set the body of the request
+
+```json
+{
+    "title" : "Test Push Notification",
+    "body": "This Notification came from our Azure Function",
+    "platform": "fcm",
+    "tagExpression": "",
+    "tags": []
+}
+```
+
+6. Click Send
+7. Observe notification arrival on device
+
+
+
+> [!IMPORTANT]
 > To run backend services locally add the following values to your `local.settings.json` file in the Functions project
 >
 > ```json
 > "NOTIFICATION_HUB_NAME": "<notification-hub-name>",
 > "NOTIFICATION_HUB_CS": "<ManagementApiAccessSignature-access-policy-connection-string>"
 > ```
+
 
 ## References
 

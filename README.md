@@ -46,6 +46,12 @@ Use the decistion tree below to determine the type of implementation you need. D
 
 ![services-decision-tree](docs/media/decision-tree.png)
 
+## Architecture
+
+### Notification Hub
+
+![notification-hub-arch](docs/media/notification-hub.jpg)
+
 ## Setup
 
 ### Notifications using `Notificatin Hub`
@@ -80,12 +86,6 @@ This setup will enable Push Notifications to mobile devices using `Notification 
 > "NOTIFICATION_HUB_NAME": "<notification-hub-name>",
 > "NOTIFICATION_HUB_CS": "<ManagementApiAccessSignature-access-policy-connection-string>"
 > ```
-
-## Architecture
-
-### Notification Hub
-
-![notification-hub-arch](docs/media/notification-hub.jpg)
 
 ## References
 

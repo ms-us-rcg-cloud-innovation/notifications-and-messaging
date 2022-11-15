@@ -44,7 +44,7 @@ In this project we will deploy:
 
 Use the decistion tree below to determine the type of implementation you need. Do you require async. or sync messaging? Do you need notifications instead?
 
-![services-decision-tre](docs/media/decision-tree.png)
+![services-decision-tree](docs/media/decision-tree.png)
 
 ## Setup
 
@@ -67,11 +67,19 @@ This setup will enable Push Notifications to mobile devices using `Notification 
         public const string NH_REGISTRATION_UPSERT_ENDPOINT = "<function-endpoint-sans-token>";
         public const string NH_REGISTRATION_FUNC_TOKEN = "<function-token>";
     }
-
   ```
 
 4. Configure Maui Firebase integration  
   3.1 [Import `google-services.json`](https://learn.microsoft.com/en-us/azure/notification-hubs/xamarin-notification-hubs-push-notifications-android-gcm#add-the-google-services-json-file) to the `Platforms/Android` folder
+
+>  `Note`
+>
+> To run backend services locally add the following values to your `local.settings.json` file in the Functions project
+>
+> ```json
+> "NOTIFICATION_HUB_NAME": "<notification-hub-name>",
+> "NOTIFICATION_HUB_CS": "<ManagementApiAccessSignature-access-policy-connection-string>"
+> ```
 
 ## Architecture
 

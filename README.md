@@ -35,8 +35,7 @@ In this project we will deploy:
       - Send Notification
 
 - Clients
-  - Maui App.
-    - Android Platform
+  - Maui Android App
 
 - CI/CD
   - Azure Functions deployment workflow

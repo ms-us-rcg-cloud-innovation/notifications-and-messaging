@@ -4,8 +4,6 @@ In this repository you'll find assets demonstrating the different messaging capa
 
 ## Contents
 
----
-
 In this project we will deploy:
 
 - Infrastructure for sending notifications and messages
@@ -14,8 +12,6 @@ In this project we will deploy:
 
 ## Prerequisites
 
----
-
 - Azure Subscription
 - Firebase project
   - [Getting started with Firebase](https://cloud.google.com/firestore/docs/client/get-firebase)
@@ -23,8 +19,6 @@ In this project we will deploy:
   - [Android Emulator Setup](https://learn.microsoft.com/en-us/xamarin/android/get-started/installation/android-emulator/)
 
 ## Project Components
-
----
 
 - Infrastructure
   - Terraform Definitions
@@ -80,10 +74,7 @@ This setup will enable Push Notifications to mobile devices using `Notification 
 4. Configure Maui Firebase integration  
   3.1 [Import `google-services.json`](https://learn.microsoft.com/en-us/azure/notification-hubs/xamarin-notification-hubs-push-notifications-android-gcm#add-the-google-services-json-file) to the `Platforms/Android` folder
 
-
 ## Architecture
-
----
 
 ### Notification Hub
 

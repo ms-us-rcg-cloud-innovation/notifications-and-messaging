@@ -101,7 +101,7 @@ This setup will enable Push Notifications to mobile devices using `Notification 
 3. Createa a _POST_ request to the _SendNotification_ function  
   3.1. Get the function url from Azure Portal
   
-  > [!IMPORTANT]
+  > :guide_dog:
   > Azure Portal > notifications-demo-rg > notification-hub-funcs-app > Functions > SendNotifications > Get Function Url
 
 4. Past Function Url to your __Postman__ request
@@ -120,9 +120,7 @@ This setup will enable Push Notifications to mobile devices using `Notification 
 6. Click Send
 7. Observe notification arrival on device
 
-
-
-> [!IMPORTANT]
+> :heavy_exclamation_mark:
 > To run backend services locally add the following values to your `local.settings.json` file in the Functions project
 >
 > ```json

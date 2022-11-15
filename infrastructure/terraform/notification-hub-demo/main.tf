@@ -12,12 +12,12 @@ provider "azurerm" {
 }
 
 locals {
-  notification_hub_name = "customer-messaging"
-  notification_hub_namespace = "notification-hub-device-messaging-namespace"
+  notification_hub_name = "customer-notifications"
+  notification_hub_namespace = "notification-hub-device-notifications-namespace"
 }
 
 resource "azurerm_resource_group" "resource_group" {
-  name     = "messaging-demo-rg"
+  name     = "notifications-demo-rg"
   location = "East US 2"
 }
 # notification hub

@@ -30,7 +30,7 @@ public static class MauiProgram
             .AddSingleton<HttpClient>(sp =>
             {
                 HttpClient client = new();
-                client.BaseAddress = new Uri(Local_Constants.REGISTRATION_UPSERT_ENDPOINT);
+                client.BaseAddress = new Uri(Local_Constants.NH_REGISTRATION_UPSERT_ENDPOINT);
 
                 return client;
             });

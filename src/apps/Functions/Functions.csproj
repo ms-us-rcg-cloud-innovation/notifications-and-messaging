@@ -15,7 +15,7 @@
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\libraries\NotificationsAndMessaging.CoreLib\NotificationsAndMessaging.CoreLib.csproj" />
+    <ProjectReference Include="..\..\libraries\CoreLib\CoreLib.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

@@ -17,7 +17,7 @@ namespace NotificationsAndMessaging.MobileMaui.Services.NotificationHubFuns
 
         public async Task<string> UpsertDeviceInstallationAsync(DeviceInstallation deviceInstallation)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Post, $"?code={Local_Constants.REGISTRATION_FUNC_TOKEN}");
+            using var request = new HttpRequestMessage(HttpMethod.Post, $"?code={Local_Constants.NH_REGISTRATION_FUNC_TOKEN}");
 
 
             request.Content = new StringContent(JsonSerializer.Serialize(deviceInstallation));

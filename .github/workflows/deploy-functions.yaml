@@ -10,7 +10,7 @@ on:
 
 env:
   AZURE_FUNCTIONAPP_NAME: 'notification-hub-functions'
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'src/apps/NotificationHub.MessagingFunctions'
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'src/apps/NotificationsAndMessaging.Functions'
   DOTNET_VERSION: '6.x'
 
 jobs:

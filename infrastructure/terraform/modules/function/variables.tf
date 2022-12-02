@@ -19,7 +19,7 @@ variable "app_service_plan_id" {
 }
 
 variable "func_app_settings" {
-    type = map(string)
+    type    = map(string)
     default = null
 }
 

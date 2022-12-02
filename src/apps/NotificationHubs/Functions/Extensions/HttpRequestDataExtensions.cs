@@ -2,7 +2,7 @@
 using NotificationsAndMessaging.Models;
 using System.Net;
 
-namespace NotificationsAndMessaging.CoreLib.FunctionHelpers
+namespace NotificationsAndMessaging.NotificationHubs.Functions.Extensions
 {
     internal static class HttpRequestDataExtensions
     {

@@ -1,11 +1,11 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using NotificationsAndMessaging.CoreLib.FunctionHelpers;
+using NotificationsAndMessaging.NotificationHubs.Functions.Extensions;
 using NotificationsAndMessaging.CoreLib.NotificationHub.Services;
 using System.Net;
 
-namespace NotificationsAndMessaging.Functions.NotificationHub.Functions
+namespace NotificationsAndMessaging.NotificationHubs.Functions
 {
     public class RegisterDeviceWithNotificationHub
     {

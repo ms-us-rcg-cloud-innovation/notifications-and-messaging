@@ -1,26 +1,26 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using NotificationsAndMessaging.CoreLib.FunctionHelpers;
+using NotificationsAndMessaging.NotificationHubs.Functions.Extensions;
 using NotificationsAndMessaging.CoreLib.NotificationHub.Services;
 using System.Net;
 
-namespace NotificationsAndMessaging.Functions.NotificationHub.Functions
+namespace NotificationsAndMessaging.NotificationHubs.Functions
 {
-    public class DeregisterDeviceWithNotificationHub
+    public class DeregisterDevice
     {
         public record Installation(string Id);
 
         private readonly ILogger _logger;
         private readonly NotificationHubService _hubService;
 
-        public DeregisterDeviceWithNotificationHub(ILogger<DeregisterDeviceWithNotificationHub> logger, NotificationHubService hubService)
+        public DeregisterDevice(ILogger<DeregisterDevice> logger, NotificationHubService hubService)
         {
             _logger = logger;
             _hubService = hubService;
         }
 
-        [Function(nameof(DeregisterDeviceWithNotificationHub))]
+        [Function(nameof(DeregisterDevice))]
         public async Task<HttpResponseData> RunAsync(
                 [HttpTrigger(
                         AuthorizationLevel.Function

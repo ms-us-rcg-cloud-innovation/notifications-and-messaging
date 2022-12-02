@@ -1,6 +1,6 @@
 ﻿using Microsoft.Azure.NotificationHubs;
 
-namespace NotificationsAndMessaging.Functions
+namespace NotificationsAndMessaging.NotificationHubs.Functions
 {
     internal class RequestHelpers
     {

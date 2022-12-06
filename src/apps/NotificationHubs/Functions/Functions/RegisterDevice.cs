@@ -7,20 +7,20 @@ using System.Net;
 
 namespace NotificationsAndMessaging.NotificationHubs.Functions
 {
-    public class RegisterDeviceWithNotificationHub
+    public class RegisterDevice
     {
         private readonly ILogger _logger;
         private readonly NotificationHubService _hubService;
 
         public record DeviceDetails(string Id, string PushChannel, string Platform, IList<string> Tags);
 
-        public RegisterDeviceWithNotificationHub(ILogger<RegisterDeviceWithNotificationHub> logger, NotificationHubService hubService)
+        public RegisterDevice(ILogger<RegisterDevice> logger, NotificationHubService hubService)
         {
             _logger = logger;
             _hubService = hubService;
         }
 
-        [Function(nameof(RegisterDeviceWithNotificationHub))]
+        [Function(nameof(RegisterDevice))]
         public async Task<HttpResponseData> RunAsync(
             [HttpTrigger(
                 AuthorizationLevel.Function

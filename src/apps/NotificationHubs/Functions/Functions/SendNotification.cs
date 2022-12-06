@@ -9,7 +9,7 @@ using System.Net;
 
 namespace NotificationsAndMessaging.NotificationHubs.Functions
 {
-    public class SendNotificationViaNotificationHub
+    public class SendNotification
     {
         private readonly ILogger _logger;
         private readonly NotificationHubService _hubService;
@@ -17,14 +17,14 @@ namespace NotificationsAndMessaging.NotificationHubs.Functions
 
         public record NotificationRequest(string Title, string Body, string Platform, string[] Tags, string TagExpression);
 
-        public SendNotificationViaNotificationHub(ILogger<SendNotificationViaNotificationHub> logger, NotificationHubService hubService, INotificationPayloadBuilder payloadBuilder)
+        public SendNotification(ILogger<SendNotification> logger, NotificationHubService hubService, INotificationPayloadBuilder payloadBuilder)
         {
             _hubService = hubService;
             _payloadBuilder = payloadBuilder;
             _logger = logger;
         }
 
-        [Function(nameof(SendNotificationViaNotificationHub))]
+        [Function(nameof(SendNotification))]
         public async Task<HttpResponseData> RunAsync(
             [HttpTrigger(
                 AuthorizationLevel.Function

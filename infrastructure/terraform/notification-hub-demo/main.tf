@@ -17,7 +17,7 @@ locals {
 }
 
 resource "azurerm_resource_group" "resource_group" {
-  name     = "notifications-demo-rg"
+  name     = "notification-hub-demo-rg"
   location = "East US 2"
 }
 # notification hub

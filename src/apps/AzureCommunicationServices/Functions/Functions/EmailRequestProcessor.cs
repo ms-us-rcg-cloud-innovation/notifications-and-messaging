@@ -1,11 +1,10 @@
-using System;
-using System.Runtime.Intrinsics.X86;
 using Azure.Communication.Email;
 using Azure.Communication.Email.Models;
 using Functions.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace Functions.Functions
 {
@@ -23,11 +22,16 @@ namespace Functions.Functions
         }
 
         [Function("EmailRequestProcessor")]
-        public async Task RunAsync(
+        [CosmosDBOutput(databaseName: "communication"
+                      , collectionName: "emails"
+                      , CreateIfNotExists = true
+                      , PartitionKey = "/id"
+                      , ConnectionStringSetting = "COSMOS_CONNECTION_STRING")]
+        public async Task<SentEmailMessage> RunAsync(
             [ServiceBusTrigger(queueName: "email-queue"
                              , Connection = "SB_CONNECTION_STRING")] EmailQueueMessage emailQueueMessage)
         {
-            var sender = _configuration.GetValue<string>("EMAIL_SENDER");
+            var sender = _configuration.GetValue<string>("EMAIL_SENDER"); 
             var toAddresses = emailQueueMessage.To.Select(toAddr => new EmailAddress(toAddr));
             EmailRecipients recipients = new(toAddresses);
             EmailContent content = new(emailQueueMessage.Subject);
@@ -38,7 +42,17 @@ namespace Functions.Functions
 
             var emailResult = await _emailClient.SendAsync(emailMessage);
 
-            _logger.LogInformation($"Email MessageId = {emailResult.Value.MessageId}");
+            SentEmailMessage message = new()
+            {
+                Id = emailResult.Value.MessageId, 
+                Importance = emailMessage.Importance,
+                Recipients = toAddresses.Select(x => x.Email),
+                Subject = emailQueueMessage.Subject, 
+                Body = emailQueueMessage.Body,
+                Status = "Sent to ACS"
+            };
+
+            return message;
         }
     }
 }

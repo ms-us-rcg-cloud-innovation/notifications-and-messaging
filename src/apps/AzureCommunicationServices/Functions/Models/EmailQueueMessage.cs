@@ -17,7 +17,7 @@ namespace Functions.Models
         [Required]
         public string Subject { get; set; }
         
-        public string? Importance { get; set; }
+        public string Importance { get; set; }
 
         [Required]
         public string Body { get; set; }

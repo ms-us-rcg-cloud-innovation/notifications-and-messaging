@@ -4,7 +4,9 @@ using Functions.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Functions.Functions
 {
@@ -20,17 +22,23 @@ namespace Functions.Functions
             _emailClient = emailClient;
             _configuration = configuration;
         }
+        
+        public record QueueMessage([Required] string[] To
+                                 , [Required] string Subject
+                                 , [Required] string Body
+                                 , string Importance);
 
         [Function("EmailRequestProcessor")]
-        [CosmosDBOutput(databaseName: "communication"
-                      , collectionName: "emails"
-                      , CreateIfNotExists = true
+        [CosmosDBOutput(databaseName: "%COSMOS_COMM_DATABASE%"
+                      , collectionName: "%COSMOS_EMAIL_COLLECTION%"            
                       , PartitionKey = "/id"
+                      , CreateIfNotExists = true
                       , ConnectionStringSetting = "COSMOS_CONNECTION_STRING")]
-        public async Task<SentEmailMessage> RunAsync(
+        public async Task<AcsEmail> RunAsync(
             [ServiceBusTrigger(queueName: "email-queue"
-                             , Connection = "SB_CONNECTION_STRING")] EmailQueueMessage emailQueueMessage)
-        {
+                             , Connection = "SB_CONNECTION_STRING")] QueueMessage emailQueueMessage
+                             , CancellationToken cancellationToken)
+        { 
             var sender = _configuration.GetValue<string>("EMAIL_SENDER"); 
             var toAddresses = emailQueueMessage.To.Select(toAddr => new EmailAddress(toAddr));
             EmailRecipients recipients = new(toAddresses);
@@ -40,16 +48,15 @@ namespace Functions.Functions
             EmailMessage emailMessage = new(sender, content, recipients);
             emailMessage.Importance = emailQueueMessage.Importance;
 
-            var emailResult = await _emailClient.SendAsync(emailMessage);
+            var emailResult = await _emailClient.SendAsync(emailMessage, cancellationToken);
 
-            SentEmailMessage message = new()
+            AcsEmail message = new()
             {
                 Id = emailResult.Value.MessageId, 
-                Importance = emailMessage.Importance,
                 Recipients = toAddresses.Select(x => x.Email),
                 Subject = emailQueueMessage.Subject, 
                 Body = emailQueueMessage.Body,
-                Status = "Sent to ACS"
+                CreationTimeStamp = DateTime.UtcNow
             };
 
             return message;

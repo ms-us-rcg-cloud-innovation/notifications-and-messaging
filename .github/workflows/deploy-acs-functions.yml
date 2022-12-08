@@ -9,8 +9,8 @@ on:
       - "docs/**"
 
 env:
-  AZURE_FUNCTIONAPP_NAME: 'notification-hub-functions'
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'src/apps/Functions'
+  AZURE_FUNCTIONAPP_NAME: 'az-comm-services-functions'
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'src/apps/AzureCommunicationServices/Functions'
   DOTNET_VERSION: '6.x'
 
 jobs:

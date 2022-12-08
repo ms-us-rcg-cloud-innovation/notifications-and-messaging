@@ -5,6 +5,7 @@
 
 # ignore all local launchSettings
 **/[Pp]roperties/[Ll]aunchSettings.json
+**/[Pp]roperties/[Ss]erviceDependencies.**.json
 
 # User-specific files
 *.rsuser
@@ -357,3 +358,5 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+/src/apps/AzureCommunicationServices/Functions/Properties/ServiceDependencies/rcg-acs-funcs - Zip Deploy/appInsights1.arm.json
+/src/apps/AzureCommunicationServices/Functions/Properties/ServiceDependencies/rcg-acs-funcs - Zip Deploy/storage1.arm.json

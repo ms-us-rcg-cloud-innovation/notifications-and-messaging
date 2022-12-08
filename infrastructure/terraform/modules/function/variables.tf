@@ -10,15 +10,16 @@ variable "storage_account_name" {
   type = string
 }
 
-variable "function_app_name" {
+variable "app_name" {
   type = string
 }
 
-variable "app_service_plan_id" {
+variable "host_sku" {
   type = string
+  default = "Y1"
 }
 
-variable "func_app_settings" {
+variable "app_settings" {
     type    = map(string)
     default = null
 }

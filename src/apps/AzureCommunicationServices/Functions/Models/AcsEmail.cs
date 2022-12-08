@@ -16,6 +16,9 @@ namespace Functions.Models
         [JsonPropertyName("subject")]
         public string Subject { get; set; }
 
+        [JsonPropertyName("importance")]
+        public string Importance { get; set; }
+
         [JsonPropertyName("body")]
         public string Body { get; set; }
     }

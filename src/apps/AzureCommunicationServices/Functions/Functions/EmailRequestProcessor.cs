@@ -52,6 +52,7 @@ namespace Functions.Functions
                 Id = emailResult.Value.MessageId,
                 Recipients = emailQueueMessage.To,
                 Subject = emailQueueMessage.Subject,
+                Importance = emailQueueMessage.Importance,
                 Body = emailQueueMessage.Body,
                 CreationTimeStamp = DateTime.UtcNow
             };

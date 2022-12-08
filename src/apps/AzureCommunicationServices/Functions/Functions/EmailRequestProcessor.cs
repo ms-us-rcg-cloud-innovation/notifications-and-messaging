@@ -34,8 +34,15 @@ namespace Functions.Functions
         public async Task<AcsEmail> RunAsync(
             [ServiceBusTrigger(queueName: "email-queue"
                              , Connection = "SB_CONNECTION_STRING")] QueueMessage emailQueueMessage
-                             , CancellationToken cancellationToken)
-        {
+                             , CancellationToken cancellationToken
+                             , FunctionContext context)
+        {            
+            var enqueuedDateTimeUtcValue = context.BindingContext.BindingData["EnqueuedTimeUtc"].ToString()[1..23]; // grab date time value only since it's wrapped in nested quotes
+
+            var messageId = context.BindingContext.BindingData["MessageId"].ToString();
+            var enqueuedDateTimeUtc = DateTime.Parse(enqueuedDateTimeUtcValue);
+
+
             var sender = _configuration.GetValue<string>("EMAIL_SENDER");
             var toAddresses = emailQueueMessage.To.Select(toAddr => new EmailAddress(toAddr));
             EmailRecipients recipients = new(toAddresses);
@@ -49,12 +56,14 @@ namespace Functions.Functions
 
             return new()
             {
-                Id = emailResult.Value.MessageId,
-                Recipients = emailQueueMessage.To,
-                Subject = emailQueueMessage.Subject,
-                Importance = emailQueueMessage.Importance,
-                Body = emailQueueMessage.Body,
-                CreationTimeStamp = DateTime.UtcNow
+                Id = emailResult.Value.MessageId  
+                , QueueMessageId = messageId
+                , QueueMessageTimeStamp = enqueuedDateTimeUtc
+                , Recipients = emailQueueMessage.To
+                , Subject = emailQueueMessage.Subject
+                , Importance = emailQueueMessage.Importance
+                , Body = emailQueueMessage.Body
+                , CreationTimeStamp = DateTime.UtcNow
             };
         }
     }

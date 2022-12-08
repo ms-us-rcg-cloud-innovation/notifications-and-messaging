@@ -7,6 +7,12 @@ namespace Functions.Models
         [JsonPropertyName("id")]
         public string Id { get; set; }
 
+        [JsonPropertyName("queueMessageId")]
+        public string QueueMessageId { get; set; }
+
+        [JsonPropertyName("queueMessageTimeStamp")]
+        public DateTime QueueMessageTimeStamp { get; set; }
+
         [JsonPropertyName("creationTimeStamp")]
         public DateTime CreationTimeStamp { get; set; }
 

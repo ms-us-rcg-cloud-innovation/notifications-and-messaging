@@ -12,9 +12,9 @@ var host = new HostBuilder()
         // add cosmos client for message store
         services.AddSingleton(sp =>
         {
-            var connectinString = context.Configuration.GetValue<string>("COSMOS_CONNECTION_STRING");            
+            var connectinString = context.Configuration.GetValue<string>("COSMOS_CONNECTION_STRING");
             CosmosClient cosmosClient = new(connectinString);
-            
+
             return cosmosClient;
         });
 

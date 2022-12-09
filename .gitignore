@@ -5,7 +5,7 @@
 
 # ignore all local launchSettings
 **/[Pp]roperties/[Ll]aunchSettings.json
-**/[Pp]roperties/[Ss]erviceDependencies.**.json
+**/[Pp]roperties/[Ss]erviceDependencies.**
 
 # User-specific files
 *.rsuser

@@ -1,10 +1,15 @@
+using Azure;
 using Azure.Communication.Email;
 using Azure.Communication.Email.Models;
+using Azure.Data.Tables;
 using Functions.Models;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.CodeAnalysis.Emit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Functions.Functions
 {
@@ -13,11 +18,14 @@ namespace Functions.Functions
         private readonly ILogger _logger;
         private readonly EmailClient _emailClient;
         private readonly IConfiguration _configuration;
+        private readonly TableServiceClient _tableServiceClient;
 
-        public EmailRequestProcessor(EmailClient emailClient, IConfiguration configuration)
+        public EmailRequestProcessor(ILogger<EmailRequestProcessor> logger, EmailClient emailClient, TableServiceClient tableClient, IConfiguration configuration)
         {
+            _logger = logger;
             _emailClient = emailClient;
             _configuration = configuration;
+            _tableServiceClient = tableClient;
         }
 
         public record QueueMessage([Required] string[] To
@@ -26,45 +34,53 @@ namespace Functions.Functions
                                  , string Importance);
 
         [Function("EmailRequestProcessor")]
-        [CosmosDBOutput(databaseName: "%COSMOS_COMM_DATABASE%"
-                      , collectionName: "%COSMOS_EMAIL_COLLECTION%"
-                      , PartitionKey = "/id"
-                      , CreateIfNotExists = true
-                      , ConnectionStringSetting = "COSMOS_CONNECTION_STRING")]
-        public async Task<AcsEmail> RunAsync(
-            [ServiceBusTrigger(queueName: "email-queue"
-                             , Connection = "SB_CONNECTION_STRING")] QueueMessage emailQueueMessage
+        public async Task RunAsync(
+            [ServiceBusTrigger(queueName: "%SB_QUEUE%"
+                             , Connection = "SB_CONNECTION_STRING")] QueueMessage queueMessage
                              , CancellationToken cancellationToken
                              , FunctionContext context)
-        {            
+        {
             var enqueuedDateTimeUtcValue = context.BindingContext.BindingData["EnqueuedTimeUtc"].ToString()[1..23]; // grab date time value only since it's wrapped in nested quotes
 
-            var messageId = context.BindingContext.BindingData["MessageId"].ToString();
+            var queueMessageId = context.BindingContext.BindingData["MessageId"].ToString();
             var enqueuedDateTimeUtc = DateTime.Parse(enqueuedDateTimeUtcValue);
 
 
             var sender = _configuration.GetValue<string>("EMAIL_SENDER");
-            var toAddresses = emailQueueMessage.To.Select(toAddr => new EmailAddress(toAddr));
+            var toAddresses = queueMessage.To.Select(toAddr => new EmailAddress(toAddr));
             EmailRecipients recipients = new(toAddresses);
-            EmailContent content = new(emailQueueMessage.Subject);
-            content.Html = emailQueueMessage.Body;
+            EmailContent content = new(queueMessage.Subject);
+            content.Html = queueMessage.Body;
 
             EmailMessage emailMessage = new(sender, content, recipients);
-            emailMessage.Importance = emailQueueMessage.Importance;
+            emailMessage.Importance = queueMessage.Importance;
 
             var emailResult = await _emailClient.SendAsync(emailMessage, cancellationToken);
 
-            return new()
+            _logger.LogInformation("Email request sent to Azure Communication Services. Message ID {messageId}", queueMessageId);
+
+            var tableResponse = await SaveDataToStorageAccountAsync(emailResult.Value.MessageId, queueMessage);
+        }
+
+        private async Task<Response> SaveDataToStorageAccountAsync(string messageId, QueueMessage queueMessage)
+        {
+
+            AcsEmailTableEntity email = new()
             {
-                Id = emailResult.Value.MessageId  
-                , QueueMessageId = messageId
-                , QueueMessageTimeStamp = enqueuedDateTimeUtc
-                , Recipients = emailQueueMessage.To
-                , Subject = emailQueueMessage.Subject
-                , Importance = emailQueueMessage.Importance
-                , Body = emailQueueMessage.Body
-                , CreationTimeStamp = DateTime.UtcNow
+                // required storage table properties
+                PartitionKey = "email",
+                RowKey = messageId,
+                Importance = queueMessage.Importance,
+                Subject= queueMessage.Subject,
+                Data = JsonSerializer.Serialize(queueMessage, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })
             };
+
+            var table = _configuration.GetValue<string>("SA_TABLE");
+            await _tableServiceClient.CreateTableIfNotExistsAsync(table);
+            TableClient tableClient = _tableServiceClient.GetTableClient(table);
+            Response tableResponse = await tableClient.AddEntityAsync(email);
+
+            return tableResponse;
         }
     }
 }

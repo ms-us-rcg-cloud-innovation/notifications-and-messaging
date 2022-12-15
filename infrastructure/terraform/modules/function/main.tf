@@ -1,8 +1,8 @@
 # app service plan host for functions
 resource "azurerm_service_plan" "func_host" {
   name = "${var.app_name}-sp"
-  resource_group_name = azurerm_resource_group.resource_group.name
-  location = azurerm_resource_group.resource_group.location
+  resource_group_name =  var.resource_group_name
+  location = var.location
   os_type = "Linux"
   sku_name = var.host_sku
 }

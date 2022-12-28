@@ -14,7 +14,7 @@ var host = new HostBuilder()
         // add azure storage account table service
         services.AddAzureClients(builder =>
         {
-            var saConnectionString = context.Configuration.GetValue<string>("RCG_ACS_SA");
+            var saConnectionString = context.Configuration.GetValue<string>("SA_CONNECTION_STRING");
             builder.AddTableServiceClient(saConnectionString);
         });
 

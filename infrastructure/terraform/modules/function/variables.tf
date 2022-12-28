@@ -6,10 +6,6 @@ variable "location" {
   type = string
 }
 
-variable "storage_account_name" {
-  type = string
-}
-
 variable "app_name" {
   type = string
 }
@@ -22,6 +18,14 @@ variable "host_sku" {
 variable "app_settings" {
     type    = map(string)
     default = null
+}
+
+variable "sa_name" {
+  type = string
+}
+
+variable "sa_key" {
+  type = string
 }
 
 

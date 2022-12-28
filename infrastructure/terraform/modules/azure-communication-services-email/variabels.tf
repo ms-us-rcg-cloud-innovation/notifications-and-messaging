@@ -10,9 +10,17 @@ variable "resource_group_id" {
   type = string
 }
 
+variable "resource_group_name" {
+  type = string
+}
+
+variable "from_email" {
+  type = string
+}
+
 variable "data_location" {
   type = string
-
+  default = "United States"
   validation {
     condition = contains(["Africa"
                         , "Asia"
@@ -39,7 +47,7 @@ variable "data_location" {
 
 variable "domain_management" {
   type = string
-
+  default = "AzureManagedDomain"
   validation {
     condition = contains(["AzureManaged"
                         , "CustomerManaged"

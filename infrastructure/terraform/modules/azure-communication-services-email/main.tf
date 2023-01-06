@@ -56,7 +56,7 @@ resource "azapi_resource" "acs" {
 data "external" "pwsh_acs_details" {
   program = [
     "pwsh", 
-    "${path.module}/acs-details.ps1"]
+    "${path.module}/get-acs-details.ps1"]
 
   query = {
     "acs_name" = resource.azapi_resource.acs.name

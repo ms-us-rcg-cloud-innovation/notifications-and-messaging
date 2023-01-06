@@ -14,4 +14,3 @@ resource "azurerm_servicebus_queue" "sb_queue" {
   requires_duplicate_detection         = true 
   dead_lettering_on_message_expiration = true
 }
-

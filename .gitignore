@@ -14,11 +14,15 @@
 *.userosscache
 *.sln.docstates
 
-# Terraform state files
+# Terraform
 .terraform/
 .terraform.lock.hcl
 terraform.tfstate
 terraform.tfstate.backup
+
+# IDE folders
+.vs
+.vscode
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

@@ -18,13 +18,17 @@ provider "azurerm" {
 }
 
 locals {
-    acs_name                = "acs-demo"
-    send_queue              = "send-mail"
-    failed_delivery_queue   = "email-failed-delivery-events"
-    delivered_email_queue   = "email-delivered-events"
-    engagement_update_queue = "email-engagement-update-events"
-    from_email              = "acs_demo_msft"
-    emails_table         = "acsEmails"
+    acs_name                = coalesce(var.comm_services_name, "acs-${timestamp()}}-demo")
+    resource_group_name     = coalesce(var.resource_group_name, "acs-${timestamp()}}-demo-rg")
+    from_email              = coalesce(var.from_email, "acs_demo_dnr")
+
+    send_email_queue        = "send-email"    
+    email_status_queue      = "email-status-events"
+    engagement_event_queue  = "email-engagement-update-events"
+
+    emails_table            = "sendEmails"
+    email_status_table      = "emailStatus"
+    engagement_events_table = "engagementEvents"
 }
 
 resource "azurerm_resource_group" "acs_resource_group" {
@@ -38,7 +42,9 @@ module "acs_storage_account" {
   resource_group_name = azurerm_resource_group.acs_resource_group.name
   location = azurerm_resource_group.acs_resource_group.location
   tables = [
-    local.emails_table
+    local.emails_table,
+    local.email_status_table,
+    local.engagement_events_table
   ]
 }
 
@@ -48,10 +54,9 @@ module "acs_processing_queues" {
   resource_group_name  = azurerm_resource_group.acs_resource_group.name
   location             = azurerm_resource_group.acs_resource_group.location
   queue_names          = [
-    local.send_queue,
-    local.failed_delivery_queue,
-    local.engagement_update_queue,
-    local.delivered_email_queue
+    local.send_email_queue,
+    local.email_status_queue,
+    local.engagement_event_queue,
   ]
 }
 
@@ -77,12 +82,19 @@ module "acs_email_input_event_handler_funcs" {
   sa_key               = module.acs_storage_account.primary_access_key
   host_sku             = "Y1"
   app_settings         = {
-    "SA_CONNECT_STRING"     = module.acs_storage_account.primary_connection_string
-    "SA_TABLE"              = local.emails_table
-    "SB_CONNECTION_STRING"  = module.acs_processing_queues.primary_connectionstrnig
-    "SB_QUEUE"              = local.send_queue
-    "ACS_CONNECTION_STRING" = module.azure_communication_services_email.primary_connectionstring
-    "EMAIL_SENDER"          = module.azure_communication_services_email.email_from
+    // storage account settings
+    "SA_CONNECTION_STRING"      = module.acs_storage_account.primary_connection_string
+    "SA_EMAIL_TABLE"            = local.emails_table
+    "SA_EVENTS_TABLE"           = local.engagement_events_table
+
+    // service bus settings
+    "SB_CONNECTION_STRING"      = module.acs_processing_queues.primary_connectionstrnig
+    "SB_SEND_EMAIL_QUEUE"       = local.send_email_queue
+    "SB_ENGAGEMENT_EVENT_QUEUE" = local.engagement_event_queue 
+
+    // azure communication services email settings
+    "ACS_CONNECTION_STRING"     = module.azure_communication_services_email.primary_connectionstring
+    "EMAIL_SENDER"              = module.azure_communication_services_email.email_from
   }
 }
 
@@ -105,29 +117,17 @@ module "acs_event_grid_topic_subscription" {
   location =  "global"
   event_source_id = module.azure_communication_services_email.acs_id
   subscriptions_with_queue_endpoint = {
-    "acs-failed-email-events-subscription" = {
-      begins_with_filters = [
-        {
-          key = "data.Status"
-          values =  [ "Failed" ]
-        }
+    "acs-email-status-events-subscription" = {
+      event_types = [ 
+        "Microsoft.Communication.EmailDeliveryReportReceived" 
       ]
-      event_types = [ "Microsoft.Communication.EmailDeliveryReportReceived" ]
-      queue_id = module.acs_processing_queues.queues[local.failed_delivery_queue].id
-    },
-    "acs-delivered-email-events-subscription" = {
-      begins_with_filters = [
-        {
-          key = "data.Status"
-          values =  [ "Succeeded" ]
-        }
-      ]
-      event_types = [ "Microsoft.Communication.EmailDeliveryReportReceived" ]
-      queue_id = module.acs_processing_queues.queues[local.delivered_email_queue].id
+      queue_id = module.acs_processing_queues.queues[local.email_status_queue].id
     },
     "acs-engagement-events-subscription" = {
-      event_types = [ "Microsoft.Communication.EmailEngagementTrackingReportReceived" ]
-      queue_id = module.acs_processing_queues.queues[local.engagement_update_queue].id      
+      event_types = [ 
+        "Microsoft.Communication.EmailEngagementTrackingReportReceived" 
+      ]
+      queue_id = module.acs_processing_queues.queues[local.engagement_event_queue ].id      
     }
   }
 }

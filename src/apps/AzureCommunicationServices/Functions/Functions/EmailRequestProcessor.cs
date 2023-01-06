@@ -28,15 +28,15 @@ namespace Functions.Functions
             _tableServiceClient = tableClient;
         }
 
-        public record QueueMessage([Required] string[] To
-                                 , [Required] string Subject
-                                 , [Required] string Body
-                                 , string Importance);
+        public record SendEmailMessage([Required] string[] To
+                                     , [Required] string Subject
+                                     , [Required] string Body
+                                     , string Importance);
 
         [Function("EmailRequestProcessor")]
         public async Task RunAsync(
-            [ServiceBusTrigger(queueName: "%SB_QUEUE%"
-                             , Connection = "SB_CONNECTION_STRING")] QueueMessage queueMessage
+            [ServiceBusTrigger(queueName: "%SB_SEND_EMAIL_QUEUE%"
+                             , Connection = "SB_CONNECTION_STRING")] SendEmailMessage queueMessage
                              , CancellationToken cancellationToken
                              , FunctionContext context)
         {
@@ -62,7 +62,7 @@ namespace Functions.Functions
             var tableResponse = await SaveDataToStorageAccountAsync(emailResult.Value.MessageId, queueMessage);
         }
 
-        private async Task<Response> SaveDataToStorageAccountAsync(string messageId, QueueMessage queueMessage)
+        private async Task<Response> SaveDataToStorageAccountAsync(string messageId, SendEmailMessage queueMessage)
         {
 
             AcsEmailTableEntity email = new()
@@ -75,7 +75,7 @@ namespace Functions.Functions
                 Data = JsonSerializer.Serialize(queueMessage, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })
             };
 
-            var table = _configuration.GetValue<string>("SA_TABLE");
+            var table = _configuration.GetValue<string>("SA_EMAIL_TABLE");
             await _tableServiceClient.CreateTableIfNotExistsAsync(table);
             TableClient tableClient = _tableServiceClient.GetTableClient(table);
             Response tableResponse = await tableClient.AddEntityAsync(email);

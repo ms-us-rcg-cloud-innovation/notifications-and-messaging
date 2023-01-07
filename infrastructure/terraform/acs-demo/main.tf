@@ -21,6 +21,7 @@ locals {
     acs_name                = var.comm_services_name
     resource_group_name     = var.resource_group_name
     from_email              = var.from_email
+    function_app_name       = var.function_app_name
 
     send_email_queue        = "send-email"    
     email_status_queue      = "email-status-events"
@@ -75,7 +76,7 @@ module "azure_communication_services_email" {
 
 module "acs_email_input_event_handler_funcs" {
   source               = "../modules/function"
-  app_name             = "rcg-acs-demo-funcs-app"
+  app_name             = local.function_app_name
   resource_group_name  = azurerm_resource_group.acs_resource_group.name
   location             = azurerm_resource_group.acs_resource_group.location
   sa_name              = module.acs_storage_account.name

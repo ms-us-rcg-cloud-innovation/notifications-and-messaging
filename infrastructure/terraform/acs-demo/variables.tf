@@ -9,3 +9,7 @@ variable "comm_services_name" {
 variable "from_email" {
     type = string
 }
+
+variable "function_app_name" {
+    type = string
+}

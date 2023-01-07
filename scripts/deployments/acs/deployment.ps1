@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $true)][string] $resourceGroupName,
+    [Parameter(Mandatory = $true)][string] $functionAppName,
     [Parameter(Mandatory = $true)][string] $acsName,
     [Parameter(Mandatory = $true)][string] $fromEmail
 )
@@ -29,7 +30,8 @@ function Build-Infrastructure {
               -out="$tfPlan" `
               -var "resource_group_name=$resourceGroupName" `
               -var "comm_services_name=$acsName" `
-              -var "from_email=$fromEmail"
+              -var "from_email=$fromEmail" `
+              -var "function_app_name=$functionAppName"
                     
     do {
         $apply_tf = (Read-Host -Prompt "Do you wish to apply the plan [y/n]?").ToLowerInvariant()
@@ -63,11 +65,6 @@ function Deploy-AcsFunctions {
     $functionAppProjectPath = "../../../src/apps/AzureCommunicationServices/Functions"
     $publishPath = "acs_funcs"
     $zipFile = "publish.zip"
-    
-    # the function name is currently hardcoded in the demo 
-    # terraform script -- so we're just using it here
-    # if you change it in terraform make sure you change it here 
-    $functionAppName = 'rcg-acs-demo-funcs-app'
 
     # if a previous depployment artifacts exist -- delete them
     if (Test-Path $publishPath) {
@@ -88,7 +85,7 @@ function Deploy-AcsFunctions {
     Get-ChildItem $publishPath | Compress-Archive -CompressionLevel "Fastest" `
                                                   -DestinationPath $zipFile
 
-    Write-Host "Deploying fucntion app 'rcg-acs-demo-funcs-app'"
+    Write-Host "Deploying fucntion app '$functionAppName'"
     az functionapp deployment source config-zip `
                     --resource-group $resourceGroupName `
                     --name $functionAppName `

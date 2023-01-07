@@ -19,6 +19,7 @@
 .terraform.lock.hcl
 terraform.tfstate
 terraform.tfstate.backup
+*.tfplan
 
 # IDE folders
 .vs

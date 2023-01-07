@@ -37,7 +37,7 @@ resource "azapi_resource" "acs_email_domain" {
 
 resource "azapi_resource" "acs" {
   type = "Microsoft.Communication/communicationServices@2022-07-01-preview"
-  name = "${var.name}-msft"
+  name = var.name
   location = "global"  
   parent_id = var.resource_group_id
   body = jsonencode({

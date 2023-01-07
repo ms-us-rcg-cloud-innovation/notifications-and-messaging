@@ -18,9 +18,9 @@ provider "azurerm" {
 }
 
 locals {
-    acs_name                = coalesce(var.comm_services_name, "acs-${timestamp()}}-demo")
-    resource_group_name     = coalesce(var.resource_group_name, "acs-${timestamp()}}-demo-rg")
-    from_email              = coalesce(var.from_email, "acs_demo_dnr")
+    acs_name                = var.comm_services_name
+    resource_group_name     = var.resource_group_name
+    from_email              = var.from_email
 
     send_email_queue        = "send-email"    
     email_status_queue      = "email-status-events"
@@ -32,7 +32,7 @@ locals {
 }
 
 resource "azurerm_resource_group" "acs_resource_group" {
-  name     = "${local.acs_name}-rg"
+  name     = local.resource_group_name
   location = "East US 2"
 }
 
@@ -50,7 +50,7 @@ module "acs_storage_account" {
 
 module "acs_processing_queues" {
   source               = "../modules/service-bus"  
-  namespace_name       = "acs-work-request-bus"
+  namespace_name       = "acs-service-bus"
   resource_group_name  = azurerm_resource_group.acs_resource_group.name
   location             = azurerm_resource_group.acs_resource_group.location
   queue_names          = [
@@ -95,6 +95,9 @@ module "acs_email_input_event_handler_funcs" {
     // azure communication services email settings
     "ACS_CONNECTION_STRING"     = module.azure_communication_services_email.primary_connectionstring
     "EMAIL_SENDER"              = module.azure_communication_services_email.email_from
+    
+    // site configs
+    "SCM_DO_BUILD_DURING_DEPLOYMENT" = false
   }
 }
 

@@ -22,7 +22,7 @@ resource "azurerm_linux_function_app" "func_app" {
   app_settings                = var.app_settings
 
   site_config {   
-       
+    
     minimum_tls_version       = "1.2"
     http2_enabled             = true
     
@@ -30,5 +30,11 @@ resource "azurerm_linux_function_app" "func_app" {
       dotnet_version              = "6.0"
       use_dotnet_isolated_runtime = true
     }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      app_settings
+    ]
   }
 } 

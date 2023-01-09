@@ -18,10 +18,14 @@ provider "azurerm" {
 }
 
 locals {
-    acs_name                = var.comm_services_name
-    resource_group_name     = var.resource_group_name
-    from_email              = var.from_email
-    function_app_name       = var.function_app_name
+  resource_group_name     = "acs-demo-rg-${random_string.random.result}" //var.resource_group_name
+    acs_name                = "acs-demo-${random_string.random.result}"//var.comm_services_name    
+    from_email              = "acs_demo_dnr"//var.from_email
+    function_app_name       = "acs-send-emails-fa-${random_string.random.result}"//var.function_app_name
+    logic_app_name          = "acs-email-events-la-${random_string.random.result}"
+    storage_account_name    = "acsdemomsftsa${random_string.random.result}"
+    service_bus_namespace   = "acs-sb-demo-${random_string.random.result}"
+    event_grid_topic_name   = "acs-events-topic-${random_string.random.result}"
 
     send_email_queue        = "send-email"    
     email_status_queue      = "email-status-events"
@@ -37,11 +41,18 @@ resource "azurerm_resource_group" "acs_resource_group" {
   location = "East US 2"
 }
 
+resource "random_string" "random" {
+  length  = 4
+  special = false
+  upper   = false
+  numeric = false
+}
+
 module "acs_storage_account" {
-  source = "../modules/storage-account"
-  name = "acsdemomsftsa"
+  source              = "../modules/storage-account"
+  name                = local.storage_account_name
   resource_group_name = azurerm_resource_group.acs_resource_group.name
-  location = azurerm_resource_group.acs_resource_group.location
+  location            = azurerm_resource_group.acs_resource_group.location
   tables = [
     local.emails_table,
     local.email_status_table,
@@ -51,7 +62,7 @@ module "acs_storage_account" {
 
 module "acs_processing_queues" {
   source               = "../modules/service-bus"  
-  namespace_name       = "acs-service-bus"
+  namespace_name       = local.service_bus_namespace
   resource_group_name  = azurerm_resource_group.acs_resource_group.name
   location             = azurerm_resource_group.acs_resource_group.location
   queue_names          = [
@@ -75,7 +86,8 @@ module "azure_communication_services_email" {
 }
 
 module "acs_email_input_event_handler_funcs" {
-  source               = "../modules/function"
+  source               = "../modules/linux-function-app"
+  service_plan_name    = local.function_app_name
   app_name             = local.function_app_name
   resource_group_name  = azurerm_resource_group.acs_resource_group.name
   location             = azurerm_resource_group.acs_resource_group.location
@@ -103,35 +115,62 @@ module "acs_email_input_event_handler_funcs" {
 }
 
 module "acs_email_output_event_handler_logic_app" {
-  source               = "../modules/logic-app"
-  app_name             = "acs-demo-rcg-event-handler"
+  source               = "../modules/logic-app-standard"
+  service_plan_name    = local.logic_app_name
+  app_name             = local.logic_app_name
   resource_group_name  = azurerm_resource_group.acs_resource_group.name
   location             = azurerm_resource_group.acs_resource_group.location
   sa_name              = module.acs_storage_account.name
   sa_key               = module.acs_storage_account.primary_access_key
   host_sku             = "WS1"
-  app_settings         = {}
+  app_settings         = {
+    
+    // service bus settings
+    "serviceBus_connectionString"  = module.acs_processing_queues.primary_connectionstrnig
+    "azureTables_connectionString" = module.acs_storage_account.primary_connection_string
+
+  }
 }
 
 module "acs_event_grid_topic_subscription" {
   source = "../modules/event-grid-system-topic"
-  topic_name = "acs-events-topic"
+  topic_name = local.event_grid_topic_name
   resource_group_name = azurerm_resource_group.acs_resource_group.name
   topic_type = "Microsoft.Communication.CommunicationServices"
   location =  "global"
   event_source_id = module.azure_communication_services_email.acs_id
   subscriptions_with_queue_endpoint = {
-    "acs-email-status-events-subscription" = {
-      event_types = [ 
+    acs-email-status-events-subscription = {
+      event_types         = [ 
         "Microsoft.Communication.EmailDeliveryReportReceived" 
       ]
-      queue_id = module.acs_processing_queues.queues[local.email_status_queue].id
+      queue_id            = module.acs_processing_queues.queues[local.email_status_queue].id,
+      delivery_properties = [
+        {
+          header_name  = "acs-status"
+          type         = "Dynamic"
+          source_field = "data.Status"
+          is_secret    = false
+        },
+        {
+          header_name  = "acs-messageId"
+          type         = "Dynamic"
+          source_field = "data.MessageId"
+          is_secret    = false
+        },
+        {
+          header_name  = "acs-event"
+          type         = "Dynamic"
+          source_field = "data.EventType"
+          is_secret    = false
+        }
+      ]
     },
-    "acs-engagement-events-subscription" = {
+    acs-engagement-events-subscription = {
       event_types = [ 
         "Microsoft.Communication.EmailEngagementTrackingReportReceived" 
       ]
-      queue_id = module.acs_processing_queues.queues[local.engagement_event_queue ].id      
+      queue_id    = module.acs_processing_queues.queues[local.engagement_event_queue].id      
     }
   }
 }

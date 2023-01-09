@@ -1,38 +1,38 @@
-[CmdletBinding()]
-param (
-    [Parameter(Mandatory = $true)][string] $resourceGroupName,
-    [Parameter(Mandatory = $true)][string] $functionAppName,
-    [Parameter(Mandatory = $true)][string] $acsName,
-    [Parameter(Mandatory = $true)][string] $fromEmail
-)
+$tfPlan = "acs.tfplan"
+$tfDir  = "../../../infrastructure/terraform/acs-demo/"
 
+function Assert-TerraformLastExitCode([string] $messageOnFailure) {
+    if($LASTEXITCODE -eq 1) {
+        Write-Host $messageOnFailure
+        Exit 1
+    }
+}
+
+function Get-TerraformOutputs {
+    $tf_output = terraform -chdir="$tfDir" output -json | ConvertFrom-Json
+    Write-Host $tf_output
+    Assert-TerraformLastExitCode("Failed to get terraform outputs")
+
+    $tf_output
+}
 
 function Build-Infrastructure {
-    $tfPlan = "acs.tfplan"
-    $tfDir  = "../../../infrastructure/terraform/acs-demo/"
-
-
     Write-Host "Initializing Terraform"
     terraform -chdir="$tfDir" init
                     
     Write-Host "Validating Terraform"
     terraform -chdir="$tfDir" validate
-            
-    # if(Test-Path $planPath)
-    # {# clean up old path
-    #     Remove-Item $planPath
-    # }
-    
+
     Write-Host "Terraform Plan"
     terraform -chdir="$tfDir" `
               plan `
               -detailed-exitcode `
-              -out="$tfPlan" `
-              -var "resource_group_name=$resourceGroupName" `
-              -var "comm_services_name=$acsName" `
-              -var "from_email=$fromEmail" `
-              -var "function_app_name=$functionAppName"
-                    
+              -out="$tfPlan"
+
+    Assert-TerraformLastExitCode("terraform plan failed")
+      
+    terraform -chdir="$tfDir" output
+
     do {
         $apply_tf = (Read-Host -Prompt "Do you wish to apply the plan [y/n]?").ToLowerInvariant()
     } while (($apply_tf -ne "y") -and ($apply_tf -ne "n"))
@@ -40,9 +40,12 @@ function Build-Infrastructure {
     if ($apply_tf -eq "y") {        
         Write-Host "Terraform Apply"
         terraform -chdir="$tfDir" apply "$tfPlan"
-    }                
-}
 
+        Assert-TerraformLastExitCode("terraform apply failed")                  
+    }                
+
+
+}
 function Start-AzLoginAndValidation {
     do {
         $login = (Read-Host -Prompt "Login to Azure [y/n]?").ToLowerInvariant()    
@@ -65,6 +68,9 @@ function Deploy-AcsFunctions {
     $functionAppProjectPath = "../../../src/apps/AzureCommunicationServices/Functions"
     $publishPath = "acs_funcs"
     $zipFile = "publish.zip"
+    $terraform_output = Get-TerraformOutputs
+    $resourceGroupName = $terraform_output.resource_group_name.value
+    $functionAppName = $terraform_output.function_app_name.value
 
     # if a previous depployment artifacts exist -- delete them
     if (Test-Path $publishPath) {
@@ -79,11 +85,15 @@ function Deploy-AcsFunctions {
     dotnet publish $functionAppProjectPath `
                 -c Release `
                 -o $publishPath `
-                --os "linux"
+                --os "linux"    
+    
+    if($LASTEXITCODE -gt 0) {
+        Write-Host "dotnet publish failed"
+        exit 1
+    }
 
     # create zip for publishing
-    Get-ChildItem $publishPath | Compress-Archive -CompressionLevel "Fastest" `
-                                                  -DestinationPath $zipFile
+    Get-ChildItem $publishPath | Compress-Archive -CompressionLevel "Fastest" -DestinationPath $zipFile
 
     Write-Host "Deploying fucntion app '$functionAppName'"
     az functionapp deployment source config-zip `
@@ -91,7 +101,6 @@ function Deploy-AcsFunctions {
                     --name $functionAppName `
                     --src $zipFile
 }
-
 
 # infrastructure deployment
 do {

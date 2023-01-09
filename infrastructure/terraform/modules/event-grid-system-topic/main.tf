@@ -29,4 +29,16 @@ resource "azurerm_eventgrid_system_topic_event_subscription" "event_subscription
       }
     }
   }
+  
+  dynamic "delivery_property" {
+    for_each    = each.value.delivery_properties == null ? [] : each.value.delivery_properties
+    content {
+      header_name  = delivery_property.value.header_name
+      type         = delivery_property.value.type
+      value        = delivery_property.value.value
+      source_field = delivery_property.value.source_field
+      secret       = delivery_property.value.is_secret
+    }
+  }
+
 }

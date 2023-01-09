@@ -16,6 +16,11 @@ locals {
   notification_hub_namespace = "notification-hub-device-notifications-namespace"
 }
 
+resource "random_string" "random" {
+  length = 4
+  lower  = true
+}
+
 resource "azurerm_resource_group" "nh_resource_group" {
   name     = "notification-hub-demo-rg"
   location = "East US 2"
@@ -30,7 +35,8 @@ module "notification_hub" {
 }
 
 module "notification_hub_function_app" {
-  source = "./modules/function"
+  source = "../modules/linux-function-app"
+  service_plan_name = "notification-hub-funcs-app-${random_string.random.result}"
   app_name = "notification-hub-funcs-app"
   resource_group_name = azurerm_resource_group.nh_resource_group.name
   location = azurerm_resource_group.nh_resource_group.location

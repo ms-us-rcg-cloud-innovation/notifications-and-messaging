@@ -17,12 +17,21 @@ variable "topic_type" {
 variable "subscriptions_with_queue_endpoint" {
   type = map(
     object({
-      queue_id = string
-      event_types = list(string)
+      queue_id            = string
+      event_types         = list(string)
       begins_with_filters = optional(set(
         object({
-          key = string
+          key    = string
           values = list(string)
+        })
+      ))
+      delivery_properties = optional(set(
+        object({   
+          header_name  = string       
+          type         = string
+          value        = optional(string)
+          source_field = optional(string)
+          is_secret    = bool
         })
       ))
     })

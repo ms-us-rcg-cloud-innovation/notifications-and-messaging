@@ -2,6 +2,10 @@ output "acs_id" {
     value = azapi_resource.acs.id
 }
 
+output "acs_name" {
+  value = azapi_resource.acs.name
+}
+
 output "primary_connectionstring" {
   value = data.external.pwsh_acs_details.result.primaryConnectionString
 }

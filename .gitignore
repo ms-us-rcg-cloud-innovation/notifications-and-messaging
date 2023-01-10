@@ -3,13 +3,11 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-# ignore dev. script deployment items
+# ignore deployment script artifacts
 *.zip
 **/[f]unc-apps
 
-# ignore all local launchSettings
-**/[Pp]roperties/[Ll]aunchSettings.json
-**/[Pp]roperties/[Ss]erviceDependencies.**
+
 
 # User-specific files
 *.rsuser
@@ -18,12 +16,6 @@
 *.userosscache
 *.sln.docstates
 
-# Terraform
-.terraform/
-.terraform.lock.hcl
-terraform.tfstate
-terraform.tfstate.backup
-*.tfplan
 
 # IDE folders
 .vs

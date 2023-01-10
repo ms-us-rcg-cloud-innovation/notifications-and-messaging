@@ -1,6 +1,6 @@
 resource "azurerm_service_plan" "logic_app_host" {
   name                = var.service_plan_name
-  resource_group_name =  var.resource_group_name
+  resource_group_name = var.resource_group_name
   location            = var.location
   os_type             = "Windows"
   sku_name            = "WS1"
@@ -19,6 +19,10 @@ resource "azurerm_logic_app_standard" "lapp_standard" {
 
   app_settings               = var.app_settings
   
+  identity {
+    type = "SystemAssigned"
+  }
+
   site_config {
     min_tls_version = "1.2" 
     elastic_instance_minimum = 1

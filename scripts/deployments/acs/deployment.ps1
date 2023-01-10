@@ -9,8 +9,12 @@ function Assert-TerraformLastExitCode([string] $messageOnFailure) {
 }
 
 function Get-TerraformOutputs {
-    $tf_output = terraform -chdir="$tfDir" output -json | ConvertFrom-Json
-    Write-Host $tf_output
+    $tf_output = terraform -chdir="$tfDir" output -json 
+
+    Write-Host ($tf_output | ConvertFrom-Json | ConvertTo-Json -Depth 100)
+
+    $tf_output = $tf_output | ConvertFrom-Json
+    
     Assert-TerraformLastExitCode("Failed to get terraform outputs")
 
     $tf_output
@@ -62,16 +66,7 @@ function Start-AzLoginAndValidation {
     
 }
 
-function Deploy-AcsFunctions {
-    
-    # azure functions deployment
-    $functionAppProjectPath = "../../../src/apps/AzureCommunicationServices/Functions"
-    $publishPath = "acs_funcs"
-    $zipFile = "publish.zip"
-    $terraform_output = Get-TerraformOutputs
-    $resourceGroupName = $terraform_output.resource_group_name.value
-    $functionAppName = $terraform_output.function_app_name.value
-
+function Clear-PublishFiles([string] $publishPath, [string] $zipFile) {
     # if a previous depployment artifacts exist -- delete them
     if (Test-Path $publishPath) {
         Remove-item -Recurse $publishPath 
@@ -80,6 +75,19 @@ function Deploy-AcsFunctions {
     if (Test-Path $zipFile) {
         Remove-Item $zipFile
     }
+}
+
+function Deploy-AcsFunctions {
+    
+    # azure functions deployment
+    $functionAppProjectPath = "../../../src/apps/AzureCommunicationServices/Functions"
+    $publishPath = "func-apps"
+    $zipFile = "fa-publish.zip"
+    $terraform_output = Get-TerraformOutputs
+    $resourceGroupName = $terraform_output.resource_group_name.value
+    $functionAppName = $terraform_output.function_app_name.value
+
+    Clear-PublishFiles $publishPath $zipFile
 
     # build and publish solution to local path
     dotnet publish $functionAppProjectPath `
@@ -100,23 +108,51 @@ function Deploy-AcsFunctions {
                     --resource-group $resourceGroupName `
                     --name $functionAppName `
                     --src $zipFile
+
+    if($LASTEXITCODE -eq 0) {
+        Clear-PublishFiles $publishPath $zipFile
+    }
+}
+
+function Deploy-AcsLogicApps {
+        # azure functions deployment
+        $logicAppProjectPath = "../../../src/apps/AzureCommunicationServices/Logic-Apps"
+        $zipFile = "la-publish.zip"
+        $terraform_output = Get-TerraformOutputs
+        $resourceGroupName = $terraform_output.resource_group_name.value
+        $logicAppName = $terraform_output.logic_app_name.value
+
+        Clear-PublishFiles $publishPath $zipFile
+
+        # create zip for publishing
+        Get-ChildItem $logicAppProjectPath | Compress-Archive -CompressionLevel "Fastest" -DestinationPath $zipFile
+
+        Write-Host "Deploying logic app '$logicAppName'"
+        az logicapp  deployment source config-zip `
+                        --resource-group $resourceGroupName `
+                        --name $logicAppName `
+                        --src $zipFile
+
+        if($LASTEXITCODE -eq 0) {
+            Clear-PublishFiles $publishPath $zipFile
+        }
+}
+
+function Submit-PromptUntilValidInputDeploymentStep($yes_or_no_prompt, $func) {
+    do {
+        $run_tf = (Read-Host -Prompt $yes_or_no_prompt).ToLowerInvariant()
+    } while (($run_tf -ne "y") -and ($run_tf -ne "n"))
+
+    if ($run_tf -eq "y") {
+        & $func
+    }
 }
 
 # infrastructure deployment
-do {
-    $run_tf = (Read-Host -Prompt "Do you wish to proceed with terraform [y/n]?").ToLowerInvariant()
-} while (($run_tf -ne "y") -and ($run_tf -ne "n"))
-
-if ($run_tf -eq "y") {
-    Build-Infrastructure
-}
+Submit-PromptUntilValidInputDeploymentStep -yes_or_no_prompt "Deploy infrastructure [y/n]? " -func Build-Infrastructure
 
 # func app deployment
-do {
-    $deploy_az_funcs = (Read-Host -Prompt "Do you wish to deploy applications to infrastructure [y/n]?").ToLowerInvariant()
-} while (($deploy_az_funcs -ne "y") -and ($deploy_az_funcs -ne "n"))
+Submit-PromptUntilValidInputDeploymentStep -yes_or_no_prompt "Deply function apps [y/n]? " -func Deploy-AcsFunctions
 
-if($deploy_az_funcs -eq "y")
-{
-    Deploy-AcsFunctions
-}
+# logic app deployment
+Submit-PromptUntilValidInputDeploymentStep -yes_or_no_prompt "Deploy logic apps [y/n]? " -func Deploy-AcsLogicApps

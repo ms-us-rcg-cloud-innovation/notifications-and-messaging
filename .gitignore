@@ -3,6 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# ignore dev. script deployment items
+*.zip
+**/[f]unc-apps
+
 # ignore all local launchSettings
 **/[Pp]roperties/[Ll]aunchSettings.json
 **/[Pp]roperties/[Ss]erviceDependencies.**

@@ -2,15 +2,15 @@ resource "azurerm_servicebus_namespace" "servicebus_ns" {
   name                = var.namespace_name
   location            = var.location
   resource_group_name = var.resource_group_name
-  sku                 = "Standard"
+  sku                 = var.sku
 }
 
 resource "azurerm_servicebus_queue" "sb_queue" {
-  for_each                             = toset(var.queue_names)
+  for_each                             = var.queues
   name                                 = each.key
   namespace_id                         = azurerm_servicebus_namespace.servicebus_ns.id
-  max_size_in_megabytes                = 1024
-  max_delivery_count                   = 5
-  requires_duplicate_detection         = true 
-  dead_lettering_on_message_expiration = true
+  max_size_in_megabytes                = each.value.max_size_in_megabytes
+  max_delivery_count                   = each.value.max_delivery_count
+  requires_duplicate_detection         = each.value.requires_duplicate_detection
+  dead_lettering_on_message_expiration = each.value.dead_lettering_on_message_expiration
 }

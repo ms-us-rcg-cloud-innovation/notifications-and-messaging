@@ -17,13 +17,6 @@ namespace Functions.Functions
         private readonly IConfiguration _configuration;
         private readonly TableServiceClient _tableServiceClient;
 
-        public HandleEngagementEventMessages(ILoggerFactory loggerFactory, TableServiceClient tableClient, IConfiguration configuration)
-        {
-            _logger = loggerFactory.CreateLogger<HandleEngagementEventMessages>();
-            _configuration = configuration;
-            _tableServiceClient = tableClient;
-        }
-
         public record EmailEventMessage(string Sender
                                       , string MessageId
                                       , DateTime UserActionTimeStamp
@@ -32,6 +25,14 @@ namespace Functions.Functions
                                       , string EngagementType);
 
         public record QueueMessage(EmailEventMessage Data);
+
+        public HandleEngagementEventMessages(ILoggerFactory loggerFactory, TableServiceClient tableClient, IConfiguration configuration)
+        {
+            _logger = loggerFactory.CreateLogger<HandleEngagementEventMessages>();
+            _configuration = configuration;
+            _tableServiceClient = tableClient;
+        }
+
 
         [Function("HandleEngagementEventMessages")]
         public async Task RunAsync(

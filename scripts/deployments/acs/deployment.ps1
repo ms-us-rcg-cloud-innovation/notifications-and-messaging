@@ -1,69 +1,42 @@
-$tfPlan = "acs.tfplan"
-$tfDir  = "../../../infrastructure/terraform/acs-demo/"
+param (
+    [Parameter()]
+    [string]
+    $location
+)
 
-function Assert-TerraformLastExitCode([string] $messageOnFailure) {
+# global variables used accross functions to properly execute terraform scripts
+$tfPlan = "acs.tfplan"
+$tfDir  = "infrastructure/terraform/acs-demo/"
+
+function Assert-TerraformHasSuccessCode([string] $messageOnFailure) {
     if($LASTEXITCODE -eq 1) {
-        Write-Host $messageOnFailure
+        Write-Host -ForegroundColor Red $messageOnFailure
         Exit 1
     }
+}
+
+function Assert-GenericSuccessCode([string] $messageOnFailure) {
+    if($LASTEXITCODE -gt 0) {
+        Write-Host -ForegroundColor Red $messageOnFailure
+        Exit 1
+    }
+}
+
+function Write-DarkYellowMessage([string] $message) {
+    Write-Host -ForegroundColor DarkYellow $message
 }
 
 function Get-TerraformOutputs {
     $tf_output = terraform -chdir="$tfDir" output -json 
 
+    # pretty print json
     Write-Host ($tf_output | ConvertFrom-Json | ConvertTo-Json -Depth 100)
 
     $tf_output = $tf_output | ConvertFrom-Json
     
-    Assert-TerraformLastExitCode("Failed to get terraform outputs")
+    Assert-TerraformHasSuccessCode("Failed to get terraform outputs")
 
     $tf_output
-}
-
-function Build-Infrastructure {
-    Write-Host "Initializing Terraform"
-    terraform -chdir="$tfDir" init
-                    
-    Write-Host "Validating Terraform"
-    terraform -chdir="$tfDir" validate
-
-    Write-Host "Terraform Plan"
-    terraform -chdir="$tfDir" `
-              plan `
-              -detailed-exitcode `
-              -out="$tfPlan"
-
-    Assert-TerraformLastExitCode("terraform plan failed")
-      
-    terraform -chdir="$tfDir" output
-
-    do {
-        $apply_tf = (Read-Host -Prompt "Do you wish to apply the plan [y/n]?").ToLowerInvariant()
-    } while (($apply_tf -ne "y") -and ($apply_tf -ne "n"))
-                    
-    if ($apply_tf -eq "y") {        
-        Write-Host "Terraform Apply"
-        terraform -chdir="$tfDir" apply "$tfPlan"
-
-        Assert-TerraformLastExitCode("terraform apply failed")                  
-    }                
-
-
-}
-function Start-AzLoginAndValidation {
-    do {
-        $login = (Read-Host -Prompt "Login to Azure [y/n]?").ToLowerInvariant()    
-    } while (($login -ne "y") -and ($login -ne "n"))
-    
-    if ($login -eq "y") {
-        # configure terraform
-        Write-Host "Login"
-        az login
-    }
-    
-    Write-Host "Subscription"
-    az account show
-    
 }
 
 function Clear-PublishFiles([string] $publishPath, [string] $zipFile) {
@@ -77,68 +50,7 @@ function Clear-PublishFiles([string] $publishPath, [string] $zipFile) {
     }
 }
 
-function Deploy-AcsFunctions {
-    
-    # azure functions deployment
-    $functionAppProjectPath = "../../../src/apps/AzureCommunicationServices/Functions"
-    $publishPath = "func-apps"
-    $zipFile = "fa-publish.zip"
-    $terraform_output = Get-TerraformOutputs
-    $resourceGroupName = $terraform_output.resource_group_name.value
-    $functionAppName = $terraform_output.function_app_name.value
-
-    Clear-PublishFiles $publishPath $zipFile
-
-    # build and publish solution to local path
-    dotnet publish $functionAppProjectPath `
-                -c Release `
-                -o $publishPath `
-                --os "linux"    
-    
-    if($LASTEXITCODE -gt 0) {
-        Write-Host "dotnet publish failed"
-        exit 1
-    }
-
-    # create zip for publishing
-    Get-ChildItem $publishPath | Compress-Archive -CompressionLevel "Fastest" -DestinationPath $zipFile
-
-    Write-Host "Deploying fucntion app '$functionAppName'"
-    az functionapp deployment source config-zip `
-                    --resource-group $resourceGroupName `
-                    --name $functionAppName `
-                    --src $zipFile
-
-    if($LASTEXITCODE -eq 0) {
-        Clear-PublishFiles $publishPath $zipFile
-    }
-}
-
-function Deploy-AcsLogicApps {
-        # azure functions deployment
-        $logicAppProjectPath = "../../../src/apps/AzureCommunicationServices/Logic-Apps"
-        $zipFile = "la-publish.zip"
-        $terraform_output = Get-TerraformOutputs
-        $resourceGroupName = $terraform_output.resource_group_name.value
-        $logicAppName = $terraform_output.logic_app_name.value
-
-        Clear-PublishFiles $publishPath $zipFile
-
-        # create zip for publishing
-        Get-ChildItem $logicAppProjectPath | Compress-Archive -CompressionLevel "Fastest" -DestinationPath $zipFile
-
-        Write-Host "Deploying logic app '$logicAppName'"
-        az logicapp  deployment source config-zip `
-                        --resource-group $resourceGroupName `
-                        --name $logicAppName `
-                        --src $zipFile
-
-        if($LASTEXITCODE -eq 0) {
-            Clear-PublishFiles $publishPath $zipFile
-        }
-}
-
-function Submit-PromptUntilValidInputDeploymentStep($yes_or_no_prompt, $func) {
+function Submit-PromptUntilYesOrNoInput($yes_or_no_prompt, $func) {
     do {
         $run_tf = (Read-Host -Prompt $yes_or_no_prompt).ToLowerInvariant()
     } while (($run_tf -ne "y") -and ($run_tf -ne "n"))
@@ -148,11 +60,105 @@ function Submit-PromptUntilValidInputDeploymentStep($yes_or_no_prompt, $func) {
     }
 }
 
+# az cli setup
+Submit-PromptUntilYesOrNoInput "Login to Azure [y/n]?" {
+    # configure terraform
+    Write-Host "az login"
+    az login
+}
+
 # infrastructure deployment
-Submit-PromptUntilValidInputDeploymentStep -yes_or_no_prompt "Deploy infrastructure [y/n]? " -func Build-Infrastructure
+Submit-PromptUntilYesOrNoInput "Execute terraform steps [y/n]?" {
+    $infra_location = $location ?? "East US 2"
+    
+    Write-DarkYellowMessage "terraform init"
+    terraform -chdir="$tfDir" init
+                    
+    Write-DarkYellowMessage "terraform validate"
+    terraform -chdir="$tfDir" validate
+
+    Write-DarkYellowMessage "terraform plan"
+    terraform -chdir="$tfDir" `
+            plan `
+            -detailed-exitcode `
+            -out="$tfPlan"
+            -var="location=$infra_location"
+            
+    Assert-TerraformHasSuccessCode("terraform plan failed")
+
+    Write-DarkYellowMessage "terraform output"
+    terraform -chdir="$tfDir" output
+
+    if($LASTEXITCODE -eq 2) { # diff has changes        
+        Submit-PromptUntilYesOrNoInput "Apply terraform plan [y/n]?" {
+            Write-DarkYellowMessage "terraform apply"
+            terraform -chdir="$tfDir" apply "$tfPlan" -var="location=$infra_location"
+        
+            Assert-TerraformHasSuccessCode("terraform apply failed")  
+        }
+    }      
+    # exit code == 0 -- diff has no changes      
+}
 
 # func app deployment
-Submit-PromptUntilValidInputDeploymentStep -yes_or_no_prompt "Deply function apps [y/n]? " -func Deploy-AcsFunctions
+Submit-PromptUntilYesOrNoInput "Deply function apps [y/n]?" {
+    # azure functions deployment
+    $functionAppProjectPath = "src/apps/AzureCommunicationServices/Functions"
+    $publishPath = "func-apps"
+    $zipFile = "fa-publish.zip"
+    $terraform_output = Get-TerraformOutputs
+    $resourceGroupName = $terraform_output.resource_group_name.value
+    $functionAppName = $terraform_output.function_app_name.value
+
+    Clear-PublishFiles $publishPath $zipFile
+
+    Write-DarkYellowMessage "dotnet publish"
+    # build and publish solution to local path
+    dotnet publish $functionAppProjectPath `
+                -c Release `
+                -o $publishPath `
+                --os "linux"    
+    
+    Assert-GenericSuccessCode "dotnet publish failed"
+
+    # create zip for publishing
+    Get-ChildItem $publishPath | Compress-Archive -CompressionLevel "Fastest" -DestinationPath $zipFile
+
+    Write-DarkYellowMessage "az functionapp deployment source config-zip | '$functionAppName'"
+    az functionapp deployment source config-zip `
+                    --resource-group $resourceGroupName `
+                    --name $functionAppName `
+                    --src $zipFile
+
+    # if deployment succeded clean up
+    # otherwise leave files for inspection
+    if($LASTEXITCODE -eq 0) {
+        Clear-PublishFiles $publishPath $zipFile
+    }
+}
 
 # logic app deployment
-Submit-PromptUntilValidInputDeploymentStep -yes_or_no_prompt "Deploy logic apps [y/n]? " -func Deploy-AcsLogicApps
+Submit-PromptUntilYesOrNoInput "Deploy logic apps [y/n]?" {
+    $logicAppProjectPath = "src/apps/AzureCommunicationServices/Logic-Apps"
+    $zipFile = "la-publish.zip"
+    $terraform_output = Get-TerraformOutputs
+    $resourceGroupName = $terraform_output.resource_group_name.value
+    $logicAppName = $terraform_output.logic_app_name.value
+
+    Clear-PublishFiles $publishPath $zipFile
+
+    # create zip for publishing
+    Get-ChildItem $logicAppProjectPath | Compress-Archive -CompressionLevel "Fastest" -DestinationPath $zipFile
+
+    Write-DarkYellowMessage "az logicapp  deployment source config-zip |'$logicAppName'"
+    az logicapp  deployment source config-zip `
+                    --resource-group $resourceGroupName `
+                    --name $logicAppName `
+                    --src $zipFile
+
+    # if deployment succeded clean up
+    # otherwise leave files for inspection
+    if($LASTEXITCODE -eq 0) {
+        Clear-PublishFiles $publishPath $zipFile
+    }
+}

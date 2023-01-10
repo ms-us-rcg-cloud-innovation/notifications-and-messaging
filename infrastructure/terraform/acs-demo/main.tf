@@ -18,27 +18,28 @@ provider "azurerm" {
 }
 
 locals {
-  resource_group_name     = "acs-demo-rg-${random_string.random.result}" //var.resource_group_name
-    acs_name                = "acs-demo-${random_string.random.result}"//var.comm_services_name    
-    from_email              = "acs_demo_dnr"//var.from_email
-    function_app_name       = "acs-send-emails-fa-${random_string.random.result}"//var.function_app_name
-    logic_app_name          = "acs-email-events-la-${random_string.random.result}"
-    storage_account_name    = "acsdemomsftsa${random_string.random.result}"
-    service_bus_namespace   = "acs-sb-demo-${random_string.random.result}"
-    event_grid_topic_name   = "acs-events-topic-${random_string.random.result}"
+  resource_group_name     = "acs-demo-rg-${random_string.random.result}"
+  location                = var.location
+  acs_name                = "acs-demo-${random_string.random.result}"  
+  from_email              = "acs_demo_dnr"
+  function_app_name       = "acs-send-emails-fa-${random_string.random.result}"
+  logic_app_name          = "acs-email-events-la-${random_string.random.result}"
+  storage_account_name    = "acsdemomsftsa${random_string.random.result}"
+  service_bus_namespace   = "acs-sb-demo-${random_string.random.result}"
+  event_grid_topic_name   = "acs-events-topic-${random_string.random.result}"
+  
+  send_email_queue        = "send-email"    
+  email_status_queue      = "email-status-events"
+  engagement_event_queue  = "email-engagement-update-events"
 
-    send_email_queue        = "send-email"    
-    email_status_queue      = "email-status-events"
-    engagement_event_queue  = "email-engagement-update-events"
-
-    emails_table            = "sendEmails"
-    email_status_table      = "emailStatus"
-    engagement_events_table = "engagementEvents"
+  emails_table            = "sendEmails"
+  email_status_table      = "emailStatus"
+  engagement_events_table = "engagementEvents"
 }
 
 resource "azurerm_resource_group" "acs_resource_group" {
   name     = local.resource_group_name
-  location = "East US 2"
+  location = local.location
 }
 
 resource "random_string" "random" {
@@ -65,11 +66,23 @@ module "acs_processing_queues" {
   namespace_name       = local.service_bus_namespace
   resource_group_name  = azurerm_resource_group.acs_resource_group.name
   location             = azurerm_resource_group.acs_resource_group.location
-  queue_names          = [
-    local.send_email_queue,
-    local.email_status_queue,
-    local.engagement_event_queue,
-  ]
+  queues               = {
+    (local.send_email_queue) = {
+      max_delivery_count                   = 5
+      requires_duplicate_detection         = true
+      dead_lettering_on_message_expiration = true
+    }
+    (local.email_status_queue) = {
+      max_delivery_count                   = 5
+      requires_duplicate_detection         = true
+      dead_lettering_on_message_expiration = true
+    }
+    (local.engagement_event_queue) = {
+      max_delivery_count                   = 5
+      requires_duplicate_detection         = true
+      dead_lettering_on_message_expiration = true
+    }
+  }  
 }
 
 module "azure_communication_services_email" {
@@ -128,7 +141,6 @@ module "acs_email_output_event_handler_logic_app" {
     // service bus settings
     "serviceBus_connectionString"  = module.acs_processing_queues.primary_connectionstrnig
     "azureTables_connectionString" = module.acs_storage_account.primary_connection_string
-
   }
 }
 
@@ -170,7 +182,21 @@ module "acs_event_grid_topic_subscription" {
       event_types = [ 
         "Microsoft.Communication.EmailEngagementTrackingReportReceived" 
       ]
-      queue_id    = module.acs_processing_queues.queues[local.engagement_event_queue].id      
+      queue_id    = module.acs_processing_queues.queues[local.engagement_event_queue].id
+      delivery_properties = [
+        {
+          header_name  = "acs-messageId"
+          type         = "Dynamic"
+          source_field = "data.MessageId"
+          is_secret    = false
+        },
+        {
+          header_name  = "acs-engagement-type"
+          type         = "Dynamic"
+          source_field = "data.EngagementType"
+          is_secret    = false
+        },
+      ]
     }
   }
 }

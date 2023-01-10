@@ -17,8 +17,10 @@ locals {
 }
 
 resource "random_string" "random" {
-  length = 4
-  lower  = true
+  length  = 4
+  special = false
+  upper   = false
+  numeric = false
 }
 
 resource "azurerm_resource_group" "nh_resource_group" {
@@ -40,7 +42,7 @@ module "notification_hub_function_app" {
   app_name = "notification-hub-funcs-app"
   resource_group_name = azurerm_resource_group.nh_resource_group.name
   location = azurerm_resource_group.nh_resource_group.location
-  storage_account_name = "nhfuncssa" #customer messaging func sa
+  storage_account_name = "nhfuncssa${random_string.random.result}" #customer messaging func sa
   host_sku = "Y1"
   app_settings = {
      # set notification hub name as an environment variable for confugration at startup time

@@ -1,4 +1,4 @@
-resource "azurerm_eventgrid_system_topic" "eg_system_topic" {
+resource "azurerm_eventgrid_system_topic" "topic" {
   name                   = var.topic_name
   topic_type             = var.topic_type
   resource_group_name    = var.resource_group_name
@@ -6,10 +6,10 @@ resource "azurerm_eventgrid_system_topic" "eg_system_topic" {
   source_arm_resource_id = var.event_source_id
 }
 
-resource "azurerm_eventgrid_system_topic_event_subscription" "event_subscription_with_queue_endpoint" {
+resource "azurerm_eventgrid_system_topic_event_subscription" "sub" {
   for_each                      = var.subscriptions_with_queue_endpoint
   name                          = each.key
-  system_topic                  = azurerm_eventgrid_system_topic.eg_system_topic.name
+  system_topic                  = azurerm_eventgrid_system_topic.topic.name
   resource_group_name           = var.resource_group_name
   service_bus_queue_endpoint_id = each.value.queue_id
 

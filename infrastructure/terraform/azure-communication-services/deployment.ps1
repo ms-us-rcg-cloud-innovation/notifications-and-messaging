@@ -4,10 +4,6 @@ param (
     $location
 )
 
-# global variables used accross functions to properly execute terraform scripts
-$tfPlan = "acs.tfplan"
-$tfDir  = "infrastructure/terraform/acs-demo/"
-
 function Assert-TerraformHasSuccessCode([string] $messageOnFailure) {
     if($LASTEXITCODE -eq 1) {
         Write-Host -ForegroundColor Red $messageOnFailure
@@ -27,7 +23,7 @@ function Write-DarkYellowMessage([string] $message) {
 }
 
 function Get-TerraformOutputs {
-    $tf_output = terraform -chdir="$tfDir" output -json 
+    $tf_output = terraform output -json 
 
     # pretty print json
     Write-Host ($tf_output | ConvertFrom-Json | ConvertTo-Json -Depth 100)
@@ -60,6 +56,21 @@ function Submit-PromptUntilYesOrNoInput($yes_or_no_prompt, $func) {
     }
 }
 
+# script body
+# memorize calling location
+$callingLocation = Get-Location
+
+$scriptPath = $MyInvocation.MyCommand.path
+$dir = Split-Path $scriptPath
+
+Set-Location $dir
+
+Write-Host -ForegroundColor Green "Changing execution location to $dir"
+
+# global variables used accross functions to properly execute terraform scripts
+$tfPlan = "acs.tfplan"
+
+
 # az cli setup
 Submit-PromptUntilYesOrNoInput "Login to Azure [y/n]?" {
     # configure terraform
@@ -69,30 +80,31 @@ Submit-PromptUntilYesOrNoInput "Login to Azure [y/n]?" {
 
 # infrastructure deployment
 Submit-PromptUntilYesOrNoInput "Execute terraform steps [y/n]?" {
-    $infra_location = $location ?? "East US 2"
+    $varsFile = "demo.tfvars"
     
     Write-DarkYellowMessage "terraform init"
-    terraform -chdir="$tfDir" init
+    terraform init
                     
     Write-DarkYellowMessage "terraform validate"
-    terraform -chdir="$tfDir" validate
+    terraform validate
 
     Write-DarkYellowMessage "terraform plan"
-    terraform -chdir="$tfDir" `
-            plan `
+    terraform plan `
             -detailed-exitcode `
-            -out="$tfPlan"
-            -var="location=$infra_location"
+            -out="$tfPlan" `
+            -var-file="$varsFile"
+    
+    $planExitCode = $LASTEXITCODE
             
     Assert-TerraformHasSuccessCode("terraform plan failed")
 
     Write-DarkYellowMessage "terraform output"
-    terraform -chdir="$tfDir" output
+    terraform output    
 
-    if($LASTEXITCODE -eq 2) { # diff has changes        
+    if($planExitCode -eq 2) { # diff has changes        
         Submit-PromptUntilYesOrNoInput "Apply terraform plan [y/n]?" {
             Write-DarkYellowMessage "terraform apply"
-            terraform -chdir="$tfDir" apply "$tfPlan" -var="location=$infra_location"
+            terraform apply "$tfPlan" 
         
             Assert-TerraformHasSuccessCode("terraform apply failed")  
         }
@@ -103,7 +115,7 @@ Submit-PromptUntilYesOrNoInput "Execute terraform steps [y/n]?" {
 # func app deployment
 Submit-PromptUntilYesOrNoInput "Deply function apps [y/n]?" {
     # azure functions deployment
-    $functionAppProjectPath = "src/apps/AzureCommunicationServices/Functions"
+    $functionAppProjectPath = "../../../src/apps/AzureCommunicationServices/Functions"
     $publishPath = "func-apps"
     $zipFile = "fa-publish.zip"
     $terraform_output = Get-TerraformOutputs
@@ -129,17 +141,18 @@ Submit-PromptUntilYesOrNoInput "Deply function apps [y/n]?" {
                     --resource-group $resourceGroupName `
                     --name $functionAppName `
                     --src $zipFile
-
+    Write-Host "`n"
     # if deployment succeded clean up
     # otherwise leave files for inspection
     if($LASTEXITCODE -eq 0) {
         Clear-PublishFiles $publishPath $zipFile
     }
+
 }
 
 # logic app deployment
 Submit-PromptUntilYesOrNoInput "Deploy logic apps [y/n]?" {
-    $logicAppProjectPath = "src/apps/AzureCommunicationServices/Logic-Apps"
+    $logicAppProjectPath = "../../../src/apps/AzureCommunicationServices/Logic-Apps"
     $zipFile = "la-publish.zip"
     $terraform_output = Get-TerraformOutputs
     $resourceGroupName = $terraform_output.resource_group_name.value
@@ -162,3 +175,6 @@ Submit-PromptUntilYesOrNoInput "Deploy logic apps [y/n]?" {
         Clear-PublishFiles $publishPath $zipFile
     }
 }
+
+# reset to calling location
+Set-Location $callingLocation

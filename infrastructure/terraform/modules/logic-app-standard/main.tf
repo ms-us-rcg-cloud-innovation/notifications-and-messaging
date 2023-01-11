@@ -1,4 +1,4 @@
-resource "azurerm_service_plan" "logic_app_host" {
+resource "azurerm_service_plan" "logic" {
   name                = var.service_plan_name
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -6,12 +6,12 @@ resource "azurerm_service_plan" "logic_app_host" {
   sku_name            = "WS1"
 }
 
-resource "azurerm_logic_app_standard" "lapp_standard" {
+resource "azurerm_logic_app_standard" "logic" {
   name                       = var.app_name
   location                   = var.location
   resource_group_name        = var.resource_group_name
   
-  app_service_plan_id        = azurerm_service_plan.logic_app_host.id
+  app_service_plan_id        = azurerm_service_plan.logic.id
   storage_account_name       = var.sa_name
   storage_account_access_key = var.sa_key
 

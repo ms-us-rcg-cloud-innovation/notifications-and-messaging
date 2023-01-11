@@ -1,5 +1,5 @@
 # app service plan host for functions
-resource "azurerm_service_plan" "func_host" {
+resource "azurerm_service_plan" "func" {
   name                = var.service_plan_name
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -7,14 +7,14 @@ resource "azurerm_service_plan" "func_host" {
   sku_name            = var.host_sku
 }
 
-resource "azurerm_linux_function_app" "func_app" {
+resource "azurerm_linux_function_app" "func" {
   name                = var.app_name
   resource_group_name = var.resource_group_name
   location            = var.location
 
   storage_account_name        = var.sa_name
   storage_account_access_key  = var.sa_key
-  service_plan_id             = azurerm_service_plan.func_host.id
+  service_plan_id             = azurerm_service_plan.func.id
   
   https_only                  = true
   functions_extension_version = "~4"

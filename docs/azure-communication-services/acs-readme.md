@@ -37,7 +37,7 @@ Later on in this document we'll walk through editing one our LogicApp Workflow t
 To quickly deploy resources and code for testing navigate to `infrastructure/terraform/azure-communication-services`. There you will see a deployment powershell script that will walk you through resource creation.  The script has one mandatory parameter, `tfvars_file`.  Use the `demo.tfvars` located in the same directory as the input. You can make any changes you need in the vars file to change deployment configurations -- such as location, names, etc.
 
 ```powershell
-.\deployment -tfvars_file demo.tfvars
+.\deployment.ps1 -tfvars_file demo.tfvars
 ```
 
 The script will prompt you to perform the following actions:

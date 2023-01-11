@@ -1,6 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text.Json;
+using Azure.Core;
+using Functions.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -8,11 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Functions.Functions
 {
-    public record SendEmailMessage(
-               string[] To
-             , string Subject
-             , string Body
-             , string Importance);
+
 
     public class EmailIntakeResponse
     {
@@ -30,7 +29,7 @@ namespace Functions.Functions
 
         public EmailIntake(ILoggerFactory loggerFactory)
         {
-            _logger = loggerFactory.CreateLogger<EmailIntake>();        
+            _logger = loggerFactory.CreateLogger<EmailIntake>();
         }
 
 
@@ -39,26 +38,29 @@ namespace Functions.Functions
         public async Task<EmailIntakeResponse> RunAsync(
             [HttpTrigger(AuthorizationLevel.Function
                        , methods: "post"
-                       , Route = "submit")] HttpRequestData  req)
+                       , Route = "submit")] HttpRequestData req
+                       , CancellationToken cancellationToken)
         {
-            _logger.LogInformation("C# HTTP trigger function processed a request.");
             EmailIntakeResponse multiResponse = new()
             {
                 HttpResponse = req.CreateResponse(HttpStatusCode.Accepted)
             };
 
-            var rawRequest = await req.ReadAsStringAsync();
+            var emailRequest = await req.ReadFromJsonAsync<SendEmailMessage>();
 
-            if(rawRequest == null) {
+            if (!emailRequest.IsValid(out var errors))
+            {
                 multiResponse.HttpResponse.StatusCode = HttpStatusCode.BadRequest;
-                await multiResponse.HttpResponse.WriteAsJsonAsync(new { Message = "No Content"});
-
-                return multiResponse;
+                await multiResponse.HttpResponse.WriteAsJsonAsync(new { Error = errors });
+                
+                _logger.LogError($"Model validation failed: {string.Join(", ", errors)}");
+            }
+            else
+            {
+                multiResponse.ServiceBusData = emailRequest;
+                await multiResponse.HttpResponse.WriteAsJsonAsync(new { Message = "Email enqueued" });
             }
 
-            var email = JsonSerializer.Deserialize<SendEmailMessage>(rawRequest);
-            multiResponse.ServiceBusData = email;
-            await multiResponse.HttpResponse.WriteAsJsonAsync(new { Message = "Email enqueued" });
 
             return multiResponse;
         }

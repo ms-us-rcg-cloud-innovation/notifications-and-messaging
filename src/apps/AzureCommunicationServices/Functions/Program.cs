@@ -4,13 +4,21 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
+using System.Text.Json;
 
 var host = new HostBuilder()
 
-    .ConfigureFunctionsWorkerDefaults()       
+    .ConfigureFunctionsWorkerDefaults()
     .ConfigureServices((context, services) =>
     {
+
+        services.Configure<JsonSerializerOptions>(options =>
+        {
+            options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.PropertyNameCaseInsensitive = true;
+            options.AllowTrailingCommas = true;
+        });
+
         // add azure storage account table service
         services.AddAzureClients(builder =>
         {

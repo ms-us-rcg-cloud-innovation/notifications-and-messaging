@@ -21,7 +21,7 @@ locals {
   resource_group_name   = var.uniquify ? "${var.resource_group_name}-${random_string.random.result}" : var.resource_group_name
   location              = var.location
   acs_name              = var.uniquify ? "${var.acs_name}-${random_string.random.result}" : var.acs_name
-  from_email            = var.uniquify ? "${var.from_email}-${random_string.random.result}" : var.from_email
+  from_email            = var.from_email
   function_app_name     = var.uniquify ? "${var.function_app_name}-${random_string.random.result}" : var.function_app_name
   logic_app_name        = var.uniquify ? "${var.logic_app_name}-${random_string.random.result}" : var.logic_app_name
   storage_account_name  = var.uniquify ? "${var.storage_account_name}${random_string.random.result}" : var.storage_account_name

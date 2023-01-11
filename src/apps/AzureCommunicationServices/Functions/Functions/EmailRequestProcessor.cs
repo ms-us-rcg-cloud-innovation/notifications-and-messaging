@@ -28,10 +28,6 @@ namespace Functions.Functions
             _tableServiceClient = tableClient;
         }
 
-        public record SendEmailMessage([Required] string[] To
-                                     , [Required] string Subject
-                                     , [Required] string Body
-                                     , string Importance);
 
         [Function("EmailRequestProcessor")]
         public async Task RunAsync(
@@ -40,26 +36,33 @@ namespace Functions.Functions
                              , CancellationToken cancellationToken
                              , FunctionContext context)
         {
-            var enqueuedDateTimeUtcValue = context.BindingContext.BindingData["EnqueuedTimeUtc"].ToString()[1..23]; // grab date time value only since it's wrapped in nested quotes
+            if(!queueMessage.IsValid(out var errors))
+            {
+                _logger.LogError($"Model validation failed: {string.Join(", ", errors)}");
+            }
+            else
+            {
+                var enqueuedDateTimeUtcValue = context.BindingContext.BindingData["EnqueuedTimeUtc"].ToString()[1..23]; // grab date time value only since it's wrapped in nested quotes
 
-            var queueMessageId = context.BindingContext.BindingData["MessageId"].ToString();
-            var enqueuedDateTimeUtc = DateTime.Parse(enqueuedDateTimeUtcValue);
+                var queueMessageId = context.BindingContext.BindingData["MessageId"].ToString();
+                var enqueuedDateTimeUtc = DateTime.Parse(enqueuedDateTimeUtcValue);
 
 
-            var sender = _configuration.GetValue<string>("EMAIL_SENDER");
-            var toAddresses = queueMessage.To.Select(toAddr => new EmailAddress(toAddr));
-            EmailRecipients recipients = new(toAddresses);
-            EmailContent content = new(queueMessage.Subject);
-            content.Html = queueMessage.Body;
+                var sender = _configuration.GetValue<string>("EMAIL_SENDER");
+                var toAddresses = queueMessage.To.Select(toAddr => new EmailAddress(toAddr));
+                EmailRecipients recipients = new(toAddresses);
+                EmailContent content = new(queueMessage.Subject);
+                content.Html = queueMessage.Body;
 
-            EmailMessage emailMessage = new(sender, content, recipients);
-            emailMessage.Importance = queueMessage.Importance;
+                EmailMessage emailMessage = new(sender, content, recipients);
+                emailMessage.Importance = queueMessage.Importance;
 
-            var emailResult = await _emailClient.SendAsync(emailMessage, cancellationToken);
+                var emailResult = await _emailClient.SendAsync(emailMessage, cancellationToken);
 
-            _logger.LogInformation("Email request sent to Azure Communication Services. Message ID {messageId}", queueMessageId);
+                _logger.LogInformation("Email request sent to Azure Communication Services. Message ID {messageId}", queueMessageId);
 
-            var tableResponse = await SaveDataToStorageAccountAsync(emailResult.Value.MessageId, queueMessage);
+                var tableResponse = await SaveDataToStorageAccountAsync(emailResult.Value.MessageId, queueMessage);
+            }
         }
 
         private async Task<Response> SaveDataToStorageAccountAsync(string messageId, SendEmailMessage queueMessage)

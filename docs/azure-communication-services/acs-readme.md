@@ -65,4 +65,4 @@ To send a test message you can send a `POST` message to the `email-intake` funct
 }
 ```
 
-This function is a simple frontend to intake queue.  It will take the HTTP request, parse the body, and submit it to the queue.  Once the message has arrived in the queue the `email-request-processor` function will build a message and submit an email for sending to ACS.  The interaction with ACS is done through the ACS sdk nuget package [Azure.Communication.Email (1.0.0-beta.1)](https://www.nuget.org/packages/Azure.Communication.Email). Detailed instrutions how to use the SDK can be found on the packages nuget site.
+This function is a simple frontend to intake queue.  It will take the HTTP request, parse the body, validate it, and if valid submit it to the queue.  Once the message has arrived in the queue the `email-request-processor` function will build a message and send it to ACS for transmit.  The interaction with ACS is done through the ACS sdk [Azure.Communication.Email (1.0.0-beta.1)](https://www.nuget.org/packages/Azure.Communication.Email). 

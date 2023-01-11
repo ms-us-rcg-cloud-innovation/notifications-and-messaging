@@ -46,4 +46,4 @@ Upon deployment navigate to your subscription and look for the newly created res
 > :globe_with_meridians:
 > Azure Communication Services and Event grid will be deployed under the `global` location
 
-To send a test message you can send a `POST` message to the `email-request-intake` function.  This 
+To send a test message you can send a `POST` message to the `email-intake` function.  This function is a simple frontend to the queue.  It will take the HTTP request, parse the body, and submit it to the queue.  Once the message has arrived in the queue the `email-request-processor` function will build a message and submit an email for sending to ACS.  The interaction with ACS is done through the ACS sdk nuget package [Azure.Communication.Email (1.0.0-beta.1)](https://www.nuget.org/packages/Azure.Communication.Email). Detailed instrutions how to use the SDK can be found on the packages nuget site.

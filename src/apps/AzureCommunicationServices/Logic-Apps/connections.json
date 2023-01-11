@@ -18,19 +18,5 @@
       },
       "displayName": "table-storage"
     }
-  },
-  "managedApiConnections": {
-    "teams": {
-      "api": {
-        "id": "/subscriptions/86f1b5b3-6a61-4667-b8af-23f9a870b657/providers/Microsoft.Web/locations/eastus/managedApis/teams"
-      },
-      "connection": {
-        "id": ""
-      },
-      "connectionRuntimeUrl": "",
-      "authentication": {
-        "type": "ManagedServiceIdentity"
-      }
-    }
   }
 }

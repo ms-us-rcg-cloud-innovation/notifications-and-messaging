@@ -62,7 +62,7 @@ namespace Functions.Functions
             TableClient tableClient = _tableServiceClient.GetTableClient(table);
             Response tableResponse = await tableClient.AddEntityAsync(email);
 
-            _logger.LogInformation($"Table HTTP status for message {eventMessage.MessageId} - {tableResponse.Status}");
+            _logger.LogInformation("Table HTTP status for message {MessageId} - {Status}", eventMessage.MessageId, tableResponse.Status);
         }
     }
 }

@@ -38,7 +38,7 @@ namespace Functions.Functions
         {
             if(!queueMessage.IsValid(out var errors))
             {
-                _logger.LogError($"Model validation failed: {string.Join(", ", errors)}");
+                _logger.LogError("Model validation failed: {Errors}", errors);
             }
             else
             {

@@ -52,8 +52,8 @@ namespace Functions.Functions
             {
                 multiResponse.HttpResponse.StatusCode = HttpStatusCode.BadRequest;
                 await multiResponse.HttpResponse.WriteAsJsonAsync(new { Error = errors });
-                
-                _logger.LogError($"Model validation failed: {string.Join(", ", errors)}");
+
+                _logger.LogError("Model validation failed: {Errors}", errors);
             }
             else
             {

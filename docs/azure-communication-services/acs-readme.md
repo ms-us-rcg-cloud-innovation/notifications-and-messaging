@@ -26,7 +26,7 @@ The demo nis focused around a serverless arhictecture that is loosely coupled us
 
 Each message is routed to an appropriate queue based on our subscription.  Once they arrive in their desitnations processing is doing using a FunctionApp or LogicApp -- all depending on the event type. The Event Grid subscriptions will also promote some properties to aid in our routing and processing of events.
 
-Later on in this document we'll walk through editing one our LogicApp Workflow to enable integration with Teams.  We'll use this integration to post message delivery updates.
+Later on in this document we'll walk through editing one our LogicApp Workflow to enable integration with Teams.  We'll use this integration to post message delivery updates in a teams channel when we've been informed of a dropped message.
 
 ### System Design
 
@@ -34,16 +34,35 @@ Later on in this document we'll walk through editing one our LogicApp Workflow t
 
 ## Setup
 
-To quickly deploy the resources shown in the architecture section we'll exectue our [deployment script for acs](../../scripts/deployments/acs/deployment.ps1). The script does its best to walk you through all the required steps:
+To quickly deploy resources and code for testing navigate to `infrastructure/terraform/azure-communication-services`. There you will see a deployment powershell script that will walk you through resource creation.  The script has one mandatory parameter, `tfvars_file`.  Use the `demo.tfvars` located in the same directory as the input. You can make any changes you need in the vars file to change deployment configurations -- such as location, names, etc.
+
+```powershell
+.\deployment -tfvars_file demo.tfvars
+```
+
+The script will prompt you to perform the following actions:
 
 - az login
 - terraform plan, validate, apply
 - function app deploy
 - logic app deploy
 
-Upon deployment navigate to your subscription and look for the newly created resource group -- `acs-demo-rg-{random-4-chars}`.  The default deployment region is **East US 2**. You can chagne this by passing the `-location` parameter to the script and setting it your desired location.  
-
 > :globe_with_meridians:
 > Azure Communication Services and Event grid will be deployed under the `global` location
 
-To send a test message you can send a `POST` message to the `email-intake` function.  This function is a simple frontend to the queue.  It will take the HTTP request, parse the body, and submit it to the queue.  Once the message has arrived in the queue the `email-request-processor` function will build a message and submit an email for sending to ACS.  The interaction with ACS is done through the ACS sdk nuget package [Azure.Communication.Email (1.0.0-beta.1)](https://www.nuget.org/packages/Azure.Communication.Email). Detailed instrutions how to use the SDK can be found on the packages nuget site.
+To send a test message you can send a `POST` message to the `email-intake` function.
+
+```json
+// Sample email request
+{
+    "To": [
+        "user1@your_domain.com",
+        "user2@your_domain.com",
+    ],
+    "Subject": "Subject line!",
+    "Body": "<p>Supports HTML tags!</p>",
+    "Importance": "Normal"
+}
+```
+
+This function is a simple frontend to intake queue.  It will take the HTTP request, parse the body, and submit it to the queue.  Once the message has arrived in the queue the `email-request-processor` function will build a message and submit an email for sending to ACS.  The interaction with ACS is done through the ACS sdk nuget package [Azure.Communication.Email (1.0.0-beta.1)](https://www.nuget.org/packages/Azure.Communication.Email). Detailed instrutions how to use the SDK can be found on the packages nuget site.

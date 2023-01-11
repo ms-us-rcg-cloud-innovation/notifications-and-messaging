@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging;
 namespace Functions.Functions
 {
     public record SendEmailMessage(
-               [Required] string[] To
-             , [Required] string Subject
-             , [Required] string Body
+               string[] To
+             , string Subject
+             , string Body
              , string Importance);
 
     public class EmailIntakeResponse

@@ -1,7 +1,7 @@
 param (
-    [Parameter()]
+    [Parameter(Mandatory = $true)]
     [string]
-    $location
+    $tfvars_file
 )
 
 function Assert-TerraformHasSuccessCode([string] $messageOnFailure) {
@@ -80,8 +80,6 @@ Submit-PromptUntilYesOrNoInput "Login to Azure [y/n]?" {
 
 # infrastructure deployment
 Submit-PromptUntilYesOrNoInput "Execute terraform steps [y/n]?" {
-    $varsFile = "demo.tfvars"
-    
     Write-DarkYellowMessage "terraform init"
     terraform init
                     
@@ -92,7 +90,7 @@ Submit-PromptUntilYesOrNoInput "Execute terraform steps [y/n]?" {
     terraform plan `
             -detailed-exitcode `
             -out="$tfPlan" `
-            -var-file="$varsFile"
+            -var-file="$tfvars_file"
     
     $planExitCode = $LASTEXITCODE
             
@@ -141,6 +139,8 @@ Submit-PromptUntilYesOrNoInput "Deply function apps [y/n]?" {
                     --resource-group $resourceGroupName `
                     --name $functionAppName `
                     --src $zipFile
+    
+    #insert empty line so next step isn't printing on 
     Write-Host "`n"
     # if deployment succeded clean up
     # otherwise leave files for inspection

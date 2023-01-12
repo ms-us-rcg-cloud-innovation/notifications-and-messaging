@@ -1,0 +1,152 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Parse_JSON": {
+                "type": "ParseJson",
+                "inputs": {
+                    "content": "@triggerOutputs()?['body']?['contentData']",
+                    "schema": {
+                        "properties": {
+                            "data": {
+                                "properties": {
+                                    "deliveryAttemptTimeStamp": {
+                                        "type": "string"
+                                    },
+                                    "messageId": {
+                                        "type": "string"
+                                    },
+                                    "recipient": {
+                                        "type": "string"
+                                    },
+                                    "sender": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "dataVersion": {
+                                "type": "string"
+                            },
+                            "eventTime": {
+                                "type": "string"
+                            },
+                            "eventType": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string"
+                            },
+                            "metadataVersion": {
+                                "type": "string"
+                            },
+                            "subject": {
+                                "type": "string"
+                            },
+                            "topic": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "runAfter": {}
+            },
+            "Insert_or_Update_Entity": {
+                "type": "ServiceProvider",
+                "inputs": {
+                    "parameters": {
+                        "tableName": "emailStatus",
+                        "entity": {
+                            "PartitionKey": "status",
+                            "RowKey": "@{body('Parse_JSON')?['data']?['messageId']}",
+                            "deliveryAttemptTimeStamp": " @{body('Parse_JSON')?['data']?['deliveryAttemptTimeStamp']}",
+                            "Recipient": "@{body('Parse_JSON')?['data']?['recipient']}",
+                            "Sender": "@{body('Parse_JSON')?['data']?['sender']}",
+                            "Status": "@{body('Parse_JSON')?['data']?['status']}",
+                            "Data": "@{triggerOutputs()?['body']}"
+                        }
+                    },
+                    "serviceProviderConfiguration": {
+                        "connectionName": "azureTables",
+                        "operationId": "upsertEntity",
+                        "serviceProviderId": "/serviceProviders/azureTables"
+                    }
+                },
+                "runAfter": {
+                    "Parse_JSON": [
+                        "Succeeded"
+                    ]
+                }
+            },
+            "Is_failed_delivery_status": {
+                "type": "If",
+                "expression": {
+                    "and": [
+                        {
+                            "equals": [
+                                "@body('Parse_JSON')?['data']?['status']",
+                                "Failed"
+                            ]
+                        }
+                    ]
+                },
+                "actions": {
+                    "Get_Entity": {
+                        "type": "ServiceProvider",
+                        "inputs": {
+                            "parameters": {
+                                "tableName": "sendEmails",
+                                "partitionKey": "email",
+                                "rowKey": "@body('Parse_JSON')?['data']?['messageId']"
+                            },
+                            "serviceProviderConfiguration": {
+                                "connectionName": "azureTables",
+                                "operationId": "getEntity",
+                                "serviceProviderId": "/serviceProviders/azureTables"
+                            }
+                        },
+                        "runAfter": {}
+                    },
+                    "Compose_Teams_Post": {
+                        "type": "Compose",
+                        "inputs": "<h1>Failed to delivery email to <code>@{body('Parse_JSON')?['data']?['recipient']}</code></h1>\n<br>\n<h2>Details</h2>\n<p><b>Message ID:</b> @{body('Parse_JSON')?['data']?['messageId']}</p>\n<p><b>Sender: </b> @{body('Parse_JSON')?['data']?['sender']}</p>\n<p><b>Recipient:</b> @{body('Parse_JSON')?['data']?['recipient']}</p>\n<p><b>Event Time Stamp:</b> @{body('Parse_JSON')?['data']?['deliveryAttemptTimeStamp']}</p>\n<p><b>Subject:</b> @{body('Get_Entity')?['Subject']}</p>\n<p><b>Importance:</b> @{body('Get_Entity')?['Importance']}</p>",
+                        "runAfter": {
+                            "Get_Entity": [
+                                "Succeeded"
+                            ]
+                        }
+                    }
+                },
+                "runAfter": {
+                    "Insert_or_Update_Entity": [
+                        "Succeeded"
+                    ]
+                }
+            }
+        },
+        "triggers": {
+            "When_email_event_arrives": {
+                "type": "ServiceProvider",
+                "inputs": {
+                    "parameters": {
+                        "queueName": "email-status-events",
+                        "isSessionsEnabled": false
+                    },
+                    "serviceProviderConfiguration": {
+                        "connectionName": "serviceBus",
+                        "operationId": "receiveQueueMessages",
+                        "serviceProviderId": "/serviceProviders/serviceBus"
+                    }
+                },
+                "splitOn": "@triggerOutputs()?['body']"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {}
+    },
+    "kind": "Stateful"
+}

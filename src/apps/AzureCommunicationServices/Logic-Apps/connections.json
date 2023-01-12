@@ -1,0 +1,22 @@
+{
+  "serviceProviderConnections": {
+    "serviceBus": {
+      "parameterValues": {
+        "connectionString": "@appsetting('serviceBus_connectionString')"
+      },
+      "serviceProvider": {
+        "id": "/serviceProviders/serviceBus"
+      },
+      "displayName": "sb-connection"
+    },
+    "azureTables": {
+      "parameterValues": {
+        "connectionString": "@appsetting('azureTables_connectionString')"
+      },
+      "serviceProvider": {
+        "id": "/serviceProviders/azureTables"
+      },
+      "displayName": "table-storage"
+    }
+  }
+}

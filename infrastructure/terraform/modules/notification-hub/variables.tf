@@ -12,7 +12,7 @@ variable "nh_namespace_name" {
 }
 
 variable "nh_namespace_sku_name" {
-  type = string
+  type    = string
   default = "Basic"
 }
 
@@ -22,6 +22,6 @@ variable "nh_name" {
 }
 
 variable "gcm_api_key" {
-  type = string
+  type    = string
   default = null
 }

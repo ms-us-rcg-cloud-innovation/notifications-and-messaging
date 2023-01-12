@@ -1,3 +1,9 @@
+*.arm.json
+
 # Mobile.BuildTools
 appsettings.json
 appsettings.*.json
+
+# ignore all local launchSettings
+**/[Pp]roperties/[Ll]aunchSettings.json
+**/[Pp]roperties/[Ss]erviceDependencies.**

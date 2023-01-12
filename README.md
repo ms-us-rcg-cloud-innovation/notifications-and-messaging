@@ -83,7 +83,7 @@ This setup will enable Push Notifications to mobile devices using `Notification 
   ```
 
 4. Configure Maui Firebase integration  
-  3.1 [Import `google-services.json`](https://learn.microsoft.com/en-us/azure/notification-hubs/xamarin-notification-hubs-push-notifications-android-gcm#add-the-google-services-json-file) to the `Platforms/Android` folder
+  4.1 [Import `google-services.json`](https://learn.microsoft.com/en-us/azure/notification-hubs/xamarin-notification-hubs-push-notifications-android-gcm#add-the-google-services-json-file) to the `Platforms/Android` folder
 
 #### Send Test Push Notificaitons using Azure Portal
 

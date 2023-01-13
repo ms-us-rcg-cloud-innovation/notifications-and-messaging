@@ -61,8 +61,8 @@
                     "parameters": {
                         "tableName": "emailStatus",
                         "entity": {
-                            "PartitionKey": "status",
-                            "RowKey": "@{body('Parse_JSON')?['data']?['messageId']}",
+                            "PartitionKey": "@{body('Parse_JSON')?['data']?['messageId']}",
+                            "RowKey": "@{triggerOutputs()?['body']?['messageId']}",
                             "deliveryAttemptTimeStamp": " @{body('Parse_JSON')?['data']?['deliveryAttemptTimeStamp']}",
                             "Recipient": "@{body('Parse_JSON')?['data']?['recipient']}",
                             "Sender": "@{body('Parse_JSON')?['data']?['sender']}",

@@ -18,8 +18,12 @@ output "logic_app_name" {
   value = local.logic_app_name
 }
 
-output "storage_account_name" {
-  value = local.storage_account_name
+output "data_storage_account_name" {
+  value = local.data_storage_account_name
+}
+
+output "apps_storage_account_name" {
+  value = local.apps_storage_account_name
 }
 
 output "service_bus_namespace" {

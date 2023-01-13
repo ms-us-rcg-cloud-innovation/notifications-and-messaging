@@ -18,5 +18,6 @@
       },
       "displayName": "table-storage"
     }
-  }
+  },
+  "managedApiConnections": {}
 }

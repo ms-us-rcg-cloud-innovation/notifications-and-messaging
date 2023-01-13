@@ -43,7 +43,7 @@ namespace Functions.Functions
             else
             {
                 var enqueuedDateTimeUtcValue = context.BindingContext.BindingData["EnqueuedTimeUtc"].ToString()[1..23]; // grab date time value only since it's wrapped in nested quotes
-
+                
                 var queueMessageId = context.BindingContext.BindingData["MessageId"].ToString();
                 var enqueuedDateTimeUtc = DateTime.Parse(enqueuedDateTimeUtcValue);
 
@@ -61,18 +61,18 @@ namespace Functions.Functions
 
                 _logger.LogInformation("Email request sent to Azure Communication Services. Message ID {messageId}", queueMessageId);
 
-                var tableResponse = await SaveDataToStorageAccountAsync(emailResult.Value.MessageId, queueMessage);
+                var tableResponse = await SaveDataToStorageAccountAsync(emailResult.Value.MessageId, queueMessageId, queueMessage);
             }
         }
 
-        private async Task<Response> SaveDataToStorageAccountAsync(string messageId, SendEmailMessage queueMessage)
+        private async Task<Response> SaveDataToStorageAccountAsync(string messageId, string queueMessageId, SendEmailMessage queueMessage)
         {
 
             AcsEmailTableEntity email = new()
             {
                 // required storage table properties
-                PartitionKey = "email",
-                RowKey = messageId,
+                PartitionKey = messageId,
+                RowKey = queueMessageId,
                 Importance = queueMessage.Importance,
                 Subject= queueMessage.Subject,
                 Data = JsonSerializer.Serialize(queueMessage, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })

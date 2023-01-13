@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "=3.0.0"
+      version = ">=3.0.0"
     }
     azapi = {
       source = "azure/azapi"
@@ -18,15 +18,17 @@ provider "azurerm" {
 }
 
 locals {
-  resource_group_name   = var.uniquify ? "${var.resource_group_name}-${random_string.random.result}" : var.resource_group_name
-  location              = var.location
-  acs_name              = var.uniquify ? "${var.acs_name}-${random_string.random.result}" : var.acs_name
-  from_email            = var.from_email
-  function_app_name     = var.uniquify ? "${var.function_app_name}-${random_string.random.result}" : var.function_app_name
-  logic_app_name        = var.uniquify ? "${var.logic_app_name}-${random_string.random.result}" : var.logic_app_name
-  storage_account_name  = var.uniquify ? "${var.storage_account_name}${random_string.random.result}" : var.storage_account_name
-  service_bus_namespace = var.uniquify ? "${var.service_bus_namespace}-${random_string.random.result}" : var.service_bus_namespace
-  event_grid_topic_name = var.uniquify ? "${var.event_grid_topic_name}-${random_string.random.result}" : var.event_grid_topic_name
+  unique_suffix             = var.uniquify ? "-${random_string.random.result}" : ""
+  resource_group_name       = "${var.resource_group_name}${local.unique_suffix}"
+  location                  = var.location
+  acs_name                  = "${var.acs_name}${local.unique_suffix}"
+  from_email                = var.from_email
+  function_app_name         = "${var.function_app_name}${local.unique_suffix}"
+  logic_app_name            = "${var.logic_app_name}${local.unique_suffix}"
+  data_storage_account_name = replace("${var.storage_account_name}${local.unique_suffix}", "-", "")
+  apps_storage_account_name = replace("appsstatesa${local.unique_suffix}", "-", "")
+  service_bus_namespace     = "${var.service_bus_namespace}${local.unique_suffix}"
+  event_grid_topic_name     = "${var.event_grid_topic_name}${local.unique_suffix}"
 
   send_email_queue       = var.send_email_queue
   email_status_queue     = var.email_status_queue
@@ -49,16 +51,25 @@ resource "random_string" "random" {
   numeric = false
 }
 
-module "acs_storage_account" {
-  source              = "../modules/storage-account"
-  name                = local.storage_account_name
-  resource_group_name = azurerm_resource_group.acs.name
-  location            = azurerm_resource_group.acs.location
+module "data_storage" {
+  source                   = "../modules/storage-account"
+  name                     = local.data_storage_account_name
+  resource_group_name      = azurerm_resource_group.acs.name
+  location                 = azurerm_resource_group.acs.location
+  account_replication_type = "ZRS"
   tables = [
     local.emails_table,
     local.email_status_table,
     local.engagement_events_table
   ]
+}
+
+module "apps_state_sa" {
+  source                   = "../modules/storage-account"
+  name                     = local.apps_storage_account_name
+  resource_group_name      = azurerm_resource_group.acs.name
+  location                 = azurerm_resource_group.acs.location
+  account_replication_type = "ZRS"
 }
 
 module "acs_processing_queues" {
@@ -104,12 +115,12 @@ module "acs_email_input_event_handler_funcs" {
   app_name            = local.function_app_name
   resource_group_name = azurerm_resource_group.acs.name
   location            = azurerm_resource_group.acs.location
-  sa_name             = module.acs_storage_account.name
-  sa_key              = module.acs_storage_account.primary_access_key
+  sa_name             = module.apps_state_sa.name
+  sa_key              = module.apps_state_sa.primary_access_key
   host_sku            = "Y1"
   app_settings = {
     // storage account settings
-    "SA_CONNECTION_STRING" = module.acs_storage_account.primary_connection_string
+    "SA_CONNECTION_STRING" = module.data_storage.primary_connection_string
     "SA_EMAIL_TABLE"       = local.emails_table
     "SA_EVENTS_TABLE"      = local.engagement_events_table
 
@@ -125,6 +136,10 @@ module "acs_email_input_event_handler_funcs" {
     // site configs
     "SCM_DO_BUILD_DURING_DEPLOYMENT" = false
   }
+
+  depends_on = [
+    module.azure_communication_services_email
+  ]
 }
 
 module "acs_email_output_event_handler_logic_app" {
@@ -133,14 +148,14 @@ module "acs_email_output_event_handler_logic_app" {
   app_name            = local.logic_app_name
   resource_group_name = azurerm_resource_group.acs.name
   location            = azurerm_resource_group.acs.location
-  sa_name             = module.acs_storage_account.name
-  sa_key              = module.acs_storage_account.primary_access_key
+  sa_name             = module.apps_state_sa.name
+  sa_key              = module.apps_state_sa.primary_access_key
   host_sku            = "WS1"
   app_settings = {
 
     // service bus settings
     "serviceBus_connectionString"  = module.acs_processing_queues.primary_connectionstrnig
-    "azureTables_connectionString" = module.acs_storage_account.primary_connection_string
+    "azureTables_connectionString" = module.data_storage.primary_connection_string
   }
 }
 

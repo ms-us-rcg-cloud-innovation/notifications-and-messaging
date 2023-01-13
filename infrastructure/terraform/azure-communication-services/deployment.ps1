@@ -5,14 +5,14 @@ param (
 )
 
 function Assert-TerraformHasSuccessCode([string] $messageOnFailure) {
-    if($LASTEXITCODE -eq 1) {
+    if ($LASTEXITCODE -eq 1) {
         Write-Host -ForegroundColor Red $messageOnFailure
         Exit 1
     }
 }
 
 function Assert-GenericSuccessCode([string] $messageOnFailure) {
-    if($LASTEXITCODE -gt 0) {
+    if ($LASTEXITCODE -gt 0) {
         Write-Host -ForegroundColor Red $messageOnFailure
         Exit 1
     }
@@ -56,125 +56,125 @@ function Submit-PromptUntilYesOrNoInput($yes_or_no_prompt, $func) {
     }
 }
 
-# script body
-# memorize calling location
-$callingLocation = Get-Location
-
 $scriptPath = $MyInvocation.MyCommand.path
 $dir = Split-Path $scriptPath
 
-Set-Location $dir
+# move to script location
+Push-Location $dir
 
 Write-Host -ForegroundColor Green "Changing execution location to $dir"
 
 # global variables used accross functions to properly execute terraform scripts
 $tfPlan = "acs.tfplan"
 
+try {
+    # az cli setup
+    Submit-PromptUntilYesOrNoInput "Login to Azure [y/n]?" {
+        # configure terraform
+        Write-Host "az login"
+        az login
+    }
 
-# az cli setup
-Submit-PromptUntilYesOrNoInput "Login to Azure [y/n]?" {
-    # configure terraform
-    Write-Host "az login"
-    az login
-}
-
-# infrastructure deployment
-Submit-PromptUntilYesOrNoInput "Execute terraform steps [y/n]?" {
-    Write-DarkYellowMessage "terraform init"
-    terraform init
+    # infrastructure deployment
+    Submit-PromptUntilYesOrNoInput "Execute terraform steps [y/n]?" {
+        Write-DarkYellowMessage "terraform init"
+        terraform init
                     
-    Write-DarkYellowMessage "terraform validate"
-    terraform validate
+        Write-DarkYellowMessage "terraform validate"
+        terraform validate
 
-    Write-DarkYellowMessage "terraform plan"
-    terraform plan `
+        Write-DarkYellowMessage "terraform plan"
+        terraform plan `
             -detailed-exitcode `
             -out="$tfPlan" `
             -var-file="$tfvars_file"
     
-    $planExitCode = $LASTEXITCODE
+        $planExitCode = $LASTEXITCODE
             
-    Assert-TerraformHasSuccessCode("terraform plan failed")
+        Assert-TerraformHasSuccessCode("terraform plan failed")
 
-    Write-DarkYellowMessage "terraform output"
-    terraform output    
+        Write-DarkYellowMessage "terraform output"
+        terraform output    
 
-    if($planExitCode -eq 2) { # diff has changes        
-        Submit-PromptUntilYesOrNoInput "Apply terraform plan [y/n]?" {
-            Write-DarkYellowMessage "terraform apply"
-            terraform apply "$tfPlan" 
+        if ($planExitCode -eq 2) {
+            # diff has changes        
+            Submit-PromptUntilYesOrNoInput "Apply terraform plan [y/n]?" {
+                Write-DarkYellowMessage "terraform apply"
+                terraform apply "$tfPlan" 
         
-            Assert-TerraformHasSuccessCode("terraform apply failed")  
+                Assert-TerraformHasSuccessCode("terraform apply failed")  
+            }
+        }      
+        # exit code == 0 -- diff has no changes      
+    }
+
+    # func app deployment
+    Submit-PromptUntilYesOrNoInput "Deply function apps [y/n]?" {
+        # azure functions deployment
+        $functionAppProjectPath = "../../../src/apps/AzureCommunicationServices/Functions"
+        $publishPath = "func-apps"
+        $zipFile = "fa-publish.zip"
+        $terraform_output = Get-TerraformOutputs
+        $resourceGroupName = $terraform_output.resource_group_name.value
+        $functionAppName = $terraform_output.function_app_name.value
+
+        Clear-PublishFiles $publishPath $zipFile
+
+        Write-DarkYellowMessage "dotnet publish"
+        # build and publish solution to local path
+        dotnet publish $functionAppProjectPath `
+            -c Release `
+            -o $publishPath `
+            --os "linux"    
+    
+        Assert-GenericSuccessCode "dotnet publish failed"
+
+        # create zip for publishing
+        Get-ChildItem $publishPath | Compress-Archive -CompressionLevel "Fastest" -DestinationPath $zipFile
+
+        Write-DarkYellowMessage "az functionapp deployment source config-zip | '$functionAppName'"
+        az functionapp deployment source config-zip `
+            --resource-group $resourceGroupName `
+            --name $functionAppName `
+            --src $zipFile
+    
+        #insert empty line so next step isn't printing on 
+        Write-Host "`n"
+        # if deployment succeded clean up
+        # otherwise leave files for inspection
+        if ($LASTEXITCODE -eq 0) {
+            Clear-PublishFiles $publishPath $zipFile
         }
-    }      
-    # exit code == 0 -- diff has no changes      
-}
 
-# func app deployment
-Submit-PromptUntilYesOrNoInput "Deply function apps [y/n]?" {
-    # azure functions deployment
-    $functionAppProjectPath = "../../../src/apps/AzureCommunicationServices/Functions"
-    $publishPath = "func-apps"
-    $zipFile = "fa-publish.zip"
-    $terraform_output = Get-TerraformOutputs
-    $resourceGroupName = $terraform_output.resource_group_name.value
-    $functionAppName = $terraform_output.function_app_name.value
-
-    Clear-PublishFiles $publishPath $zipFile
-
-    Write-DarkYellowMessage "dotnet publish"
-    # build and publish solution to local path
-    dotnet publish $functionAppProjectPath `
-                -c Release `
-                -o $publishPath `
-                --os "linux"    
-    
-    Assert-GenericSuccessCode "dotnet publish failed"
-
-    # create zip for publishing
-    Get-ChildItem $publishPath | Compress-Archive -CompressionLevel "Fastest" -DestinationPath $zipFile
-
-    Write-DarkYellowMessage "az functionapp deployment source config-zip | '$functionAppName'"
-    az functionapp deployment source config-zip `
-                    --resource-group $resourceGroupName `
-                    --name $functionAppName `
-                    --src $zipFile
-    
-    #insert empty line so next step isn't printing on 
-    Write-Host "`n"
-    # if deployment succeded clean up
-    # otherwise leave files for inspection
-    if($LASTEXITCODE -eq 0) {
-        Clear-PublishFiles $publishPath $zipFile
     }
 
-}
+    # logic app deployment
+    Submit-PromptUntilYesOrNoInput "Deploy logic apps [y/n]?" {
+        $logicAppProjectPath = "../../../src/apps/AzureCommunicationServices/Logic-Apps"
+        $zipFile = "la-publish.zip"
+        $terraform_output = Get-TerraformOutputs
+        $resourceGroupName = $terraform_output.resource_group_name.value
+        $logicAppName = $terraform_output.logic_app_name.value
 
-# logic app deployment
-Submit-PromptUntilYesOrNoInput "Deploy logic apps [y/n]?" {
-    $logicAppProjectPath = "../../../src/apps/AzureCommunicationServices/Logic-Apps"
-    $zipFile = "la-publish.zip"
-    $terraform_output = Get-TerraformOutputs
-    $resourceGroupName = $terraform_output.resource_group_name.value
-    $logicAppName = $terraform_output.logic_app_name.value
-
-    Clear-PublishFiles $publishPath $zipFile
-
-    # create zip for publishing
-    Get-ChildItem $logicAppProjectPath | Compress-Archive -CompressionLevel "Fastest" -DestinationPath $zipFile
-
-    Write-DarkYellowMessage "az logicapp  deployment source config-zip |'$logicAppName'"
-    az logicapp  deployment source config-zip `
-                    --resource-group $resourceGroupName `
-                    --name $logicAppName `
-                    --src $zipFile
-
-    # if deployment succeded clean up
-    # otherwise leave files for inspection
-    if($LASTEXITCODE -eq 0) {
         Clear-PublishFiles $publishPath $zipFile
+
+        # create zip for publishing
+        Get-ChildItem $logicAppProjectPath | Compress-Archive -CompressionLevel "Fastest" -DestinationPath $zipFile
+
+        Write-DarkYellowMessage "az logicapp  deployment source config-zip |'$logicAppName'"
+        az logicapp  deployment source config-zip `
+            --resource-group $resourceGroupName `
+            --name $logicAppName `
+            --src $zipFile
+
+        # if deployment succeded clean up
+        # otherwise leave files for inspection
+        if ($LASTEXITCODE -eq 0) {
+            Clear-PublishFiles $publishPath $zipFile
+        }
     }
 }
-
-# reset to calling location
-Set-Location $callingLocation
+finally {
+    # reset to calling location
+    Pop-Location
+}

@@ -24,7 +24,7 @@ namespace Functions.Functions
                                       , string UserAgent
                                       , string EngagementType);
 
-        public record QueueMessage(EmailEventMessage Data);
+        public record QueueMessage(string Id, EmailEventMessage Data);
 
         public HandleEngagementEventMessages(ILoggerFactory loggerFactory, TableServiceClient tableClient, IConfiguration configuration)
         {
@@ -45,8 +45,8 @@ namespace Functions.Functions
             AcsEmailEventTableEntity email = new()
             {
                 // required storage table properties
-                PartitionKey = "event",
-                RowKey = eventMessage.MessageId,
+                PartitionKey = eventMessage.MessageId,
+                RowKey = queueMessage.Id,
 
                 EngagementContext = eventMessage.EngagementContext,
                 EngagementType = eventMessage.EngagementType,

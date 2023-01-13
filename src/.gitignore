@@ -7,3 +7,4 @@ appsettings.*.json
 # ignore all local launchSettings
 **/[Pp]roperties/[Ll]aunchSettings.json
 **/[Pp]roperties/[Ss]erviceDependencies.**
+

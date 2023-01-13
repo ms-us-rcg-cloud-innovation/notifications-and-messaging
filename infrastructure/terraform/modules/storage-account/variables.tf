@@ -24,3 +24,8 @@ variable "account_replication_type" {
   type = string
   default = "LRS"
 }
+
+variable "access_tier" {
+  type = string  
+  default = "Hot"
+}

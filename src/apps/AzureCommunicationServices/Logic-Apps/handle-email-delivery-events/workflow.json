@@ -111,7 +111,7 @@
                         },
                         "runAfter": {}
                     },
-                    "Compose_Teams_Post": {
+                    "Compose_HTML_message": {
                         "type": "Compose",
                         "inputs": "<h1>Failed to delivery email to <code>@{body('Parse_JSON')?['data']?['recipient']}</code></h1>\n<br>\n<h2>Details</h2>\n<p><b>Message ID:</b> @{body('Parse_JSON')?['data']?['messageId']}</p>\n<p><b>Sender: </b> @{body('Parse_JSON')?['data']?['sender']}</p>\n<p><b>Recipient:</b> @{body('Parse_JSON')?['data']?['recipient']}</p>\n<p><b>Event Time Stamp:</b> @{body('Parse_JSON')?['data']?['deliveryAttemptTimeStamp']}</p>\n<p><b>Subject:</b> @{body('Get_Entity')?['Subject']}</p>\n<p><b>Importance:</b> @{body('Get_Entity')?['Importance']}</p>",
                         "runAfter": {

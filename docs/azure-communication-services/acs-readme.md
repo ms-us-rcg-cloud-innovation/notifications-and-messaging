@@ -50,10 +50,9 @@ The script will prompt you to perform the following actions:
 > :globe_with_meridians:
 > Azure Communication Services and Event grid will be deployed under the `global` location
 
-To send a test message you can send a `POST` message to the `email-intake` function.
+To send a test email you can send a `POST` request to the `EmailIntake` function using the defined structure:
 
 ```json
-// Sample email request
 {
     "To": [
         "user1@your_domain.com",
@@ -65,4 +64,4 @@ To send a test message you can send a `POST` message to the `email-intake` funct
 }
 ```
 
-This function is a simple frontend to intake queue.  It will take the HTTP request, parse the body, validate it, and if valid submit it to the queue.  Once the message has arrived in the queue the `email-request-processor` function will build a message and send it to ACS for transmit.  The interaction with ACS is done through the ACS sdk [Azure.Communication.Email (1.0.0-beta.1)](https://www.nuget.org/packages/Azure.Communication.Email). 
+This function is a simple frontend to intake queue.  It will take the HTTP request, parse the body, validate it, and if valid submit it to the queue.  Once the message has arrived in the queue the `email-request-processor` function will build a message and send it to ACS for transmit.  The interaction with ACS is done through the ACS sdk [Azure.Communication.Email (1.0.0-beta.1)](https://www.nuget.org/packages/Azure.Communication.Email).

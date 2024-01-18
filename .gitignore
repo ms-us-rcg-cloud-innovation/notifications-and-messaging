@@ -351,3 +351,6 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+/src/apps/MobileMaui/Local.Constants.cs
+/src/apps/AzureCommunicationServices/Logic-Apps/local.settings.json
+/src/apps/NotificationHubs/Functions/local.settings.json

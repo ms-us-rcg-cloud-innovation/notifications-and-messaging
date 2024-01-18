@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "607098465599",
+    "firebase_url": "https://notification-hubs-b2fe9-default-rtdb.firebaseio.com",
+    "project_id": "notification-hubs-b2fe9",
+    "storage_bucket": "notification-hubs-b2fe9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:607098465599:android:0bdc0b29ddec599407f78a",
+        "android_client_info": {
+          "package_name": "msft.rcg.demo.notificationhub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "607098465599-300bk0oen7vgaph797drp4v669h0eo6t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHGl1qKpds2Q1IpreBrD871kOQI5Tti84"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "607098465599-300bk0oen7vgaph797drp4v669h0eo6t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,19 @@
+{
+  "IsEncrypted": false,
+  "Host": {},
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    // ACS settings
+    "ACS_CONNECTION_STRING": "endpoint=https://acs-demo-mphbt.communication.azure.com/;accesskey=HuY9bP9l2h4GwL5jmEbFwlKm8qdLDKeMjScu2Mqe3z9wC0UydRSPbgG8jeI13Jsl4paFKSPBkolPucFvjIsSyA==",
+    "EMAIL_SENDER": "acs_demo_dnr-mphbt@b7dfb266-e02d-49ab-80ca-a2b7412a1d15.azurecomm.net",
+    // service bus settings
+    "SB_CONNECTION_STRING": "Endpoint=sb://acs-sb-demo-mphbt.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=HpiLDDsLVUH4z0lLPm1amsGmyJKE3Qgfpbs53Bj3Gno=",
+    "SB_SEND_EMAIL_QUEUE": "send-email",
+    "SB_ENGAGEMENT_EVENT_QUEUE": "email-engagement-update-events",
+    // storage account settings
+    "SA_CONNECTION_STRING": "DefaultEndpointsProtocol=https;AccountName=acsdemomsftsamphbt;AccountKey=hTRULSbsjhwfLx6BqLWa3zqQjPkEwN+BTHhMNgKgJb+paYLWNb3Zt+HKXWCNd0Jo2s53fn+gh2IS+AStNiI/BA==;EndpointSuffix=core.windows.net",
+    "SA_EMAIL_TABLE": "sendEmails",
+    "SA_EVENTS_TABLE": "emailStatus"
+  }
+}
